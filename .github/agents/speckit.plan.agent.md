@@ -5,9 +5,6 @@ handoffs:
     agent: speckit.tasks
     prompt: Break the plan into tasks
     send: true
-  - label: Create Checklist
-    agent: speckit.checklist
-    prompt: Create a checklist for the following domain...
 ---
 
 ## User Input

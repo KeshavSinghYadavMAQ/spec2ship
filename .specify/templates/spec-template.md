@@ -8,6 +8,21 @@
 
 **Input**: User description: "$ARGUMENTS"
 
+## Constitution Alignment *(mandatory)*
+
+<!--
+  ACTION REQUIRED: Confirm this spec complies with the project constitution.
+  Be explicit and evidence-driven. If any item is not yet known, add
+  NEEDS CLARIFICATION with a concrete follow-up question.
+-->
+
+- **Business Value Mapping**: [Map each planned user story to measurable retail value]
+- **Backend Standard**: [Confirm Python + Microsoft Agent Framework + Copilot SDK usage]
+- **Harness Plan**: [List harness scenarios that will be created before implementation]
+- **Frontend Experience**: [Confirm responsive React UI and dark/light mode requirements]
+- **Operational Readiness**: [Summarize observability, security, and audit expectations]
+- **Azure Architecture and Cost**: [Map solution to Azure Well-Architected pillars and define minimal-cost constraints]
+
 ## User Scenarios & Testing *(mandatory)*
 
 <!--

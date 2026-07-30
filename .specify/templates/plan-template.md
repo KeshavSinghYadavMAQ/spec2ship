@@ -40,7 +40,12 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] Outcome-Driven Retail Value: Every planned story maps to explicit business value and measurable outcomes.
+- [ ] Python Agent Backend Standard: Technical approach uses Python backend with Microsoft Agent Framework and Copilot SDK.
+- [ ] Harness-First Validation: Harness and contract-testing approach is defined before implementation starts.
+- [ ] Production React Experience: Plan includes responsive React UI with dark/light mode and accessibility validation.
+- [ ] Operational Trustworthiness: Observability, security controls, and production-readiness evidence are planned.
+- [ ] Azure Well-Architected and Cost Efficiency: Plan maps to Azure WAF pillars and includes minimal-cost architecture decisions.
 
 ## Project Structure
 
