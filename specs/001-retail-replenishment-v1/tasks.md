@@ -24,14 +24,14 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create backend project structure per [plan.md](./plan.md): `backend/src/{agents,api,domain/{inventory,alerting,replenishment,forecasting,transfer_balance,analytics,admin},integrations,schemas,infrastructure}`, `backend/tests/{unit,integration,contract,harness}`
-- [ ] T002 Create frontend project structure per [plan.md](./plan.md): `frontend/src/{app,components,features/{inventory,alerting,replenishment,forecasting,transfer-balance,analytics,admin},services,hooks,theme,utils}`, `frontend/tests/`
-- [ ] T003 [P] Initialize backend Python 3.12 project (`backend/pyproject.toml`) with FastAPI, Microsoft Agent Framework, Copilot SDK, Pydantic v2, SQLAlchemy 2.0 (`mssql+pyodbc`), pytest, pytest-asyncio, httpx
-- [ ] T004 [P] Initialize frontend Vite + React 18 + TypeScript project (`frontend/package.json`) with `@fluentui/react-components`, `@tanstack/react-query`
-- [ ] T005 [P] Configure backend linting/formatting/type-checking (ruff, black, mypy) in `backend/pyproject.toml`
-- [ ] T006 [P] Configure frontend ESLint/Prettier/TypeScript strict config in `frontend/.eslintrc.cjs`, `frontend/tsconfig.json`
-- [ ] T007 Establish harness scaffolding (scenario runner + CI wiring) in `backend/tests/harness/runner.py`
-- [ ] T008 [P] Configure Vitest and Playwright test runners in `frontend/tests/`
+- [X] T001 Create backend project structure per [plan.md](./plan.md): `backend/src/{agents,api,domain/{inventory,alerting,replenishment,forecasting,transfer_balance,analytics,admin},integrations,schemas,infrastructure}`, `backend/tests/{unit,integration,contract,harness}`
+- [X] T002 Create frontend project structure per [plan.md](./plan.md): `frontend/src/{app,components,features/{inventory,alerting,replenishment,forecasting,transfer-balance,analytics,admin},services,hooks,theme,utils}`, `frontend/tests/`
+- [X] T003 [P] Initialize backend Python 3.12 project (`backend/pyproject.toml`) with FastAPI, Microsoft Agent Framework, Copilot SDK, Pydantic v2, SQLAlchemy 2.0 (`mssql+pyodbc`), pytest, pytest-asyncio, httpx
+- [X] T004 [P] Initialize frontend Vite + React 18 + TypeScript project (`frontend/package.json`) with `@fluentui/react-components`, `@tanstack/react-query`
+- [X] T005 [P] Configure backend linting/formatting/type-checking (ruff, black, mypy) in `backend/pyproject.toml`
+- [X] T006 [P] Configure frontend ESLint/Prettier/TypeScript strict config in `frontend/.eslintrc.cjs`, `frontend/tsconfig.json`
+- [X] T007 Establish harness scaffolding (scenario runner + CI wiring) in `backend/tests/harness/runner.py`
+- [X] T008 [P] Configure Vitest and Playwright test runners in `frontend/tests/`
 
 **Checkpoint**: Tooling and scaffolding ready.
 
@@ -43,25 +43,25 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T009 Setup Azure SQL Database connection/session management in `backend/src/infrastructure/db.py` (async-bridge engine per [research.md](./research.md))
-- [ ] T010 Setup Alembic migrations framework in `backend/src/infrastructure/migrations/`
-- [ ] T011 [P] Implement Redis client wrapper in `backend/src/infrastructure/cache.py` (suppression windows FR-003, evaluation locks FR-023, rate-limit token buckets FR-024)
-- [ ] T012 [P] Implement Azure Service Bus client wrapper in `backend/src/infrastructure/queue.py` (inbound event queue/replay FR-022)
-- [ ] T013 [P] Define `ProblemDetail` error schema in `backend/src/schemas/errors.py`
-- [ ] T014 [P] Implement `UserRoleAssignment` model and RBAC authorization dependency in `backend/src/domain/admin/rbac.py` (FR-013, 5 roles)
-- [ ] T015 Implement per-source-system rate-limiting middleware in `backend/src/api/middleware/rate_limit.py` (FR-024: 429 + `Retry-After`, token bucket via Redis)
-- [ ] T016 [P] Setup FastAPI app, `/v1` versioned router mounting, and exception handlers (map to `ProblemDetail`) in `backend/src/api/main.py`
-- [ ] T017 [P] Configure structured logging, metrics, and tracing baseline in `backend/src/infrastructure/observability.py`
-- [ ] T018 [P] Configure environment/config management (Pydantic Settings) in `backend/src/infrastructure/config.py`
-- [ ] T019 Implement `IntegrationEvent` model and queue-and-replay processing service in `backend/src/domain/inventory/integration_event.py` (FR-022; queued → processing → applied, or dead_lettered → replayed → applied)
-- [ ] T020 Implement `InventoryPosition` model and repository in `backend/src/domain/inventory/models.py` (shared read dependency for US2–US8)
-- [ ] T021 Implement `ProductLocationPolicy` model with `edit_lock_held` field in `backend/src/domain/alerting/policy_models.py` (FR-016, FR-023; shared read dependency for US2/US3)
-- [ ] T022 Implement `StorePriorityProfile` model in `backend/src/domain/transfer_balance/priority_models.py` (FR-019; shared read dependency for US5)
-- [ ] T023 [P] Implement audit log writer service in `backend/src/domain/admin/audit.py` (FR-014, FR-018)
-- [ ] T024 [P] Setup React app shell, routing, and Fluent UI theme provider with dark/light toggle in `frontend/src/app/App.tsx` and `frontend/src/theme/`
-- [ ] T025 [P] Configure TanStack Query client and base API service in `frontend/src/services/apiClient.ts`
-- [ ] T026 [P] Add responsive layout and dark/light theme snapshot tests in `frontend/tests/theme.test.tsx`
-- [ ] T027 [P] Implement cost-guardrail tracking hooks (SC-008, Constitution VI) in `backend/src/infrastructure/cost_guardrails.py`
+- [X] T009 Setup Azure SQL Database connection/session management in `backend/src/infrastructure/db.py` (async-bridge engine per [research.md](./research.md))
+- [X] T010 Setup Alembic migrations framework in `backend/src/infrastructure/migrations/`
+- [X] T011 [P] Implement Redis client wrapper in `backend/src/infrastructure/cache.py` (suppression windows FR-003, evaluation locks FR-023, rate-limit token buckets FR-024)
+- [X] T012 [P] Implement Azure Service Bus client wrapper in `backend/src/infrastructure/queue.py` (inbound event queue/replay FR-022)
+- [X] T013 [P] Define `ProblemDetail` error schema in `backend/src/schemas/errors.py`
+- [X] T014 [P] Implement `UserRoleAssignment` model and RBAC authorization dependency in `backend/src/domain/admin/rbac.py` (FR-013, 5 roles)
+- [X] T015 Implement per-source-system rate-limiting middleware in `backend/src/api/middleware/rate_limit.py` (FR-024: 429 + `Retry-After`, token bucket via Redis)
+- [X] T016 [P] Setup FastAPI app, `/v1` versioned router mounting, and exception handlers (map to `ProblemDetail`) in `backend/src/api/main.py`
+- [X] T017 [P] Configure structured logging, metrics, and tracing baseline in `backend/src/infrastructure/observability.py`
+- [X] T018 [P] Configure environment/config management (Pydantic Settings) in `backend/src/infrastructure/config.py`
+- [X] T019 Implement `IntegrationEvent` model and queue-and-replay processing service in `backend/src/domain/inventory/integration_event.py` (FR-022; queued → processing → applied, or dead_lettered → replayed → applied)
+- [X] T020 Implement `InventoryPosition` model and repository in `backend/src/domain/inventory/models.py` (shared read dependency for US2–US8)
+- [X] T021 Implement `ProductLocationPolicy` model with `edit_lock_held` field in `backend/src/domain/alerting/policy_models.py` (FR-016, FR-023; shared read dependency for US2/US3)
+- [X] T022 Implement `StorePriorityProfile` model in `backend/src/domain/transfer_balance/priority_models.py` (FR-019; shared read dependency for US5)
+- [X] T023 [P] Implement audit log writer service in `backend/src/domain/admin/audit.py` (FR-014, FR-018)
+- [X] T024 [P] Setup React app shell, routing, and Fluent UI theme provider with dark/light toggle in `frontend/src/app/App.tsx` and `frontend/src/theme/`
+- [X] T025 [P] Configure TanStack Query client and base API service in `frontend/src/services/apiClient.ts`
+- [X] T026 [P] Add responsive layout and dark/light theme snapshot tests in `frontend/tests/theme.test.tsx`
+- [X] T027 [P] Implement cost-guardrail tracking hooks (SC-008, Constitution VI) in `backend/src/infrastructure/cost_guardrails.py`
 
 **Checkpoint**: Foundation ready — user story implementation can now begin.
 
@@ -75,20 +75,20 @@
 
 ### Tests and Harness for User Story 1 (REQUIRED) ⚠️
 
-- [ ] T028 [P] [US1] Contract test `GET /v1/inventory/positions` in `backend/tests/contract/test_inventory_positions.py`
-- [ ] T029 [P] [US1] Contract test `POST /v1/inventory/events` (incl. 429 rate-limit response) in `backend/tests/contract/test_inventory_events.py`
-- [ ] T030 [P] [US1] Integration test for shelf/backroom reconciliation journey in `backend/tests/integration/test_inventory_reconciliation.py`
-- [ ] T031 [US1] Harness scenario — happy path (stock update visible within freshness target), failure path (malformed event), data-quality edge case (duplicate/out-of-order events) in `backend/tests/harness/test_inventory_harness.py`
+- [X] T028 [P] [US1] Contract test `GET /v1/inventory/positions` in `backend/tests/contract/test_inventory_positions.py`
+- [X] T029 [P] [US1] Contract test `POST /v1/inventory/events` (incl. 429 rate-limit response) in `backend/tests/contract/test_inventory_events.py`
+- [X] T030 [P] [US1] Integration test for shelf/backroom reconciliation journey in `backend/tests/integration/test_inventory_reconciliation.py`
+- [X] T031 [US1] Harness scenario — happy path (stock update visible within freshness target), failure path (malformed event), data-quality edge case (duplicate/out-of-order events) in `backend/tests/harness/test_inventory_harness.py`
 
 ### Implementation for User Story 1
 
-- [ ] T032 [US1] Implement inventory reconciliation service (shelf+backroom totals, dedupe/out-of-order handling) in `backend/src/domain/inventory/service.py` (FR-001)
-- [ ] T033 [US1] Implement `GET /v1/inventory/positions` endpoint in `backend/src/api/routers/inventory.py`
-- [ ] T034 [US1] Implement `POST /v1/inventory/events` endpoint wired to Service Bus queue + rate-limit middleware in `backend/src/api/routers/inventory.py` (FR-012, FR-024)
-- [ ] T035 [US1] Implement replay/reconciliation worker with data-freshness warning flag in `backend/src/domain/inventory/replay_worker.py` (FR-022)
-- [ ] T036 [P] [US1] Build inventory position table/detail view (shelf/backroom/reconciled total, freshness indicator) in `frontend/src/features/inventory/InventoryPositionView.tsx`
-- [ ] T037 [US1] Wire inventory feature to API via TanStack Query hooks in `frontend/src/features/inventory/hooks/useInventoryPositions.ts`
-- [ ] T038 [US1] Add loading/empty/error/stale-data states to the inventory view
+- [X] T032 [US1] Implement inventory reconciliation service (shelf+backroom totals, dedupe/out-of-order handling) in `backend/src/domain/inventory/service.py` (FR-001)
+- [X] T033 [US1] Implement `GET /v1/inventory/positions` endpoint in `backend/src/api/routers/inventory.py`
+- [X] T034 [US1] Implement `POST /v1/inventory/events` endpoint wired to Service Bus queue + rate-limit middleware in `backend/src/api/routers/inventory.py` (FR-012, FR-024)
+- [X] T035 [US1] Implement replay/reconciliation worker with data-freshness warning flag in `backend/src/domain/inventory/replay_worker.py` (FR-022)
+- [X] T036 [P] [US1] Build inventory position table/detail view (shelf/backroom/reconciled total, freshness indicator) in `frontend/src/features/inventory/InventoryPositionView.tsx`
+- [X] T037 [US1] Wire inventory feature to API via TanStack Query hooks in `frontend/src/features/inventory/hooks/useInventoryPositions.ts`
+- [X] T038 [US1] Add loading/empty/error/stale-data states to the inventory view
 
 **Checkpoint**: User Story 1 fully functional and independently testable.
 
@@ -102,19 +102,19 @@
 
 ### Tests and Harness for User Story 2 (REQUIRED) ⚠️
 
-- [ ] T039 [P] [US2] Contract test `GET /v1/alerts` and `POST /v1/alerts/{alertId}/transition` in `backend/tests/contract/test_alerts.py`
-- [ ] T040 [P] [US2] Integration test for threshold breach → alert → routing → suppression journey in `backend/tests/integration/test_alert_lifecycle.py`
-- [ ] T041 [US2] Harness scenario — happy path (low-stock alert routed), failure path (routing channel unavailable), data-quality edge case (repeated breaches suppressed) in `backend/tests/harness/test_alerting_harness.py`
+- [X] T039 [P] [US2] Contract test `GET /v1/alerts` and `POST /v1/alerts/{alertId}/transition` in `backend/tests/contract/test_alerts.py`
+- [X] T040 [P] [US2] Integration test for threshold breach → alert → routing → suppression journey in `backend/tests/integration/test_alert_lifecycle.py`
+- [X] T041 [US2] Harness scenario — happy path (low-stock alert routed), failure path (routing channel unavailable), data-quality edge case (repeated breaches suppressed) in `backend/tests/harness/test_alerting_harness.py`
 
 ### Implementation for User Story 2
 
-- [ ] T042 [US2] Implement `StockAlert` model with 5-state lifecycle (Open, Acknowledged, Escalated, Snoozed, Resolved) in `backend/src/domain/alerting/models.py`
-- [ ] T043 [US2] Implement threshold evaluation service reading `ProductLocationPolicy` + `InventoryPosition` in `backend/src/domain/alerting/evaluation_service.py` (FR-002)
-- [ ] T044 [US2] Implement alert deduplication/suppression using Redis TTL windows in `backend/src/domain/alerting/suppression.py` (FR-003)
-- [ ] T045 [US2] Implement alert routing/notification dispatch in `backend/src/domain/alerting/routing.py` (FR-003)
-- [ ] T046 [US2] Implement `GET /v1/alerts` and `POST /v1/alerts/{alertId}/transition` endpoints in `backend/src/api/routers/alerts.py`
-- [ ] T047 [P] [US2] Build alert worklist view (status/severity filters, lifecycle transitions) in `frontend/src/features/alerting/AlertWorklist.tsx`
-- [ ] T048 [US2] Wire alerting feature to API via TanStack Query hooks in `frontend/src/features/alerting/hooks/useAlerts.ts`
+- [X] T042 [US2] Implement `StockAlert` model with 5-state lifecycle (Open, Acknowledged, Escalated, Snoozed, Resolved) in `backend/src/domain/alerting/models.py`
+- [X] T043 [US2] Implement threshold evaluation service reading `ProductLocationPolicy` + `InventoryPosition` in `backend/src/domain/alerting/evaluation_service.py` (FR-002)
+- [X] T044 [US2] Implement alert deduplication/suppression using Redis TTL windows in `backend/src/domain/alerting/suppression.py` (FR-003)
+- [X] T045 [US2] Implement alert routing/notification dispatch in `backend/src/domain/alerting/routing.py` (FR-003)
+- [X] T046 [US2] Implement `GET /v1/alerts` and `POST /v1/alerts/{alertId}/transition` endpoints in `backend/src/api/routers/alerts.py`
+- [X] T047 [P] [US2] Build alert worklist view (status/severity filters, lifecycle transitions) in `frontend/src/features/alerting/AlertWorklist.tsx`
+- [X] T048 [US2] Wire alerting feature to API via TanStack Query hooks in `frontend/src/features/alerting/hooks/useAlerts.ts`
 
 **Checkpoint**: User Stories 1 AND 2 both work independently.
 
@@ -128,19 +128,19 @@
 
 ### Tests and Harness for User Story 3 (REQUIRED) ⚠️
 
-- [ ] T049 [P] [US3] Contract test `GET /v1/replenishment/recommendations` and `POST /v1/replenishment/recommendations/{id}/decision` in `backend/tests/contract/test_replenishment.py`
-- [ ] T050 [P] [US3] Integration test recommendation generation + explanation journey in `backend/tests/integration/test_replenishment_flow.py`
-- [ ] T051 [US3] Harness scenario — happy path (reorder quantity/timing produced), failure path (missing policy inputs), data-quality edge case (abrupt lead-time change) in `backend/tests/harness/test_replenishment_harness.py`
+- [X] T049 [P] [US3] Contract test `GET /v1/replenishment/recommendations` and `POST /v1/replenishment/recommendations/{id}/decision` in `backend/tests/contract/test_replenishment.py`
+- [X] T050 [P] [US3] Integration test recommendation generation + explanation journey in `backend/tests/integration/test_replenishment_flow.py`
+- [X] T051 [US3] Harness scenario — happy path (reorder quantity/timing produced), failure path (missing policy inputs), data-quality edge case (abrupt lead-time change) in `backend/tests/harness/test_replenishment_harness.py`
 
 ### Implementation for User Story 3
 
-- [ ] T052 [US3] Implement `ReplenishmentRecommendation` model in `backend/src/domain/replenishment/models.py`
-- [ ] T053 [US3] Implement reorder-point/min-max/lead-time/safety-stock recommendation engine in `backend/src/domain/replenishment/engine.py` (FR-004)
-- [ ] T054 [US3] Implement MAF/Copilot SDK rationale-explanation agent wrapper (explanation only, not the decision) in `backend/src/agents/replenishment_explainer.py` (FR-005)
-- [ ] T055 [US3] Implement `GET /v1/replenishment/recommendations` and decision endpoints in `backend/src/api/routers/replenishment.py`
-- [ ] T056 [P] [US3] Build recommendation review panel with rationale display and accept/override/dismiss actions in `frontend/src/features/replenishment/RecommendationPanel.tsx`
-- [ ] T057 [US3] Wire replenishment feature to API via TanStack Query hooks in `frontend/src/features/replenishment/hooks/useRecommendations.ts`
-- [ ] T105 [US3] Capture operator actionability rating on the recommendation decision endpoint/UI (extend `POST /v1/replenishment/recommendations/{id}/decision` schema + `RecommendationPanel.tsx`) to measure SC-004 in `backend/src/api/routers/replenishment.py` and `frontend/src/features/replenishment/RecommendationPanel.tsx`
+- [X] T052 [US3] Implement `ReplenishmentRecommendation` model in `backend/src/domain/replenishment/models.py`
+- [X] T053 [US3] Implement reorder-point/min-max/lead-time/safety-stock recommendation engine in `backend/src/domain/replenishment/engine.py` (FR-004)
+- [X] T054 [US3] Implement MAF/Copilot SDK rationale-explanation agent wrapper (explanation only, not the decision) in `backend/src/agents/replenishment_explainer.py` (FR-005)
+- [X] T055 [US3] Implement `GET /v1/replenishment/recommendations` and decision endpoints in `backend/src/api/routers/replenishment.py`
+- [X] T056 [P] [US3] Build recommendation review panel with rationale display and accept/override/dismiss actions in `frontend/src/features/replenishment/RecommendationPanel.tsx`
+- [X] T057 [US3] Wire replenishment feature to API via TanStack Query hooks in `frontend/src/features/replenishment/hooks/useRecommendations.ts`
+- [X] T105 [US3] Capture operator actionability rating on the recommendation decision endpoint/UI (extend `POST /v1/replenishment/recommendations/{id}/decision` schema + `RecommendationPanel.tsx`) to measure SC-004 in `backend/src/api/routers/replenishment.py` and `frontend/src/features/replenishment/RecommendationPanel.tsx`
 
 **Checkpoint**: All P1 stories (US1–US3) independently functional — MVP.
 
