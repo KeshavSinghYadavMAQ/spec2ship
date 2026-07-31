@@ -31,8 +31,12 @@
 
 ## Notes
 
-- All three [NEEDS CLARIFICATION] markers (FR-001, FR-005, FR-006) were resolved on 2026-08-01:
-  (1) realistic-looking identifiers now, descriptive Store/Product reference data deferred as a
-  fast-follow; (2) pilot-scale dataset (1,000+ stores, 100,000+ SKUs); (3) UI refresh applies to
-  all existing feature screens now. Spec is ready for `/speckit.clarify` (optional, since no
-  markers remain) or `/speckit.plan`.
+- All three initial [NEEDS CLARIFICATION] markers (FR-001, FR-005, FR-006) were resolved on
+  2026-08-01: (1) realistic-looking identifiers now, descriptive Store/Product reference data
+  deferred as a fast-follow; (2) pilot-scale dataset (1,000+ stores, 100,000+ SKUs); (3) UI
+  refresh applies to all existing feature screens now.
+- A `/speckit.clarify` pass on 2026-08-01 resolved 3 further ambiguities not covered by the
+  original markers: (4) seeding is gated by `admin` role AND a non-production environment
+  safeguard (FR-004); (5) seeding is resumable/idempotent after a partial failure, no automatic
+  rollback required (FR-003); (6) an explicit clear/reset action for sample data is required in
+  v1, gated the same way as seeding (FR-011). Spec is ready for `/speckit.plan`.

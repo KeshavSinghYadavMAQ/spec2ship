@@ -24,6 +24,9 @@
 - Q: Should sample data introduce new human-readable store/product reference details (e.g., store name, city/region, product category), or just make today's plain identifiers (`sku_id`, `location_id`) look realistic? → A: Both — ship realistic-looking identifiers now (e.g., `STORE-CHICAGO-014`, `SKU-COFFEE-12OZ`); descriptive Store/Product reference data (human-readable name, city/region, category) is an explicit fast-follow, out of scope for this feature's initial delivery.
 - Q: How large should the seeded sample dataset be? → A: Pilot-scale volume, consistent with spec 001's target scale (1,000+ stores, 100,000+ distinct SKUs), so the dataset also exercises performance and UX at scale.
 - Q: Which screens are in scope for the colorful modern UI refresh? → A: All existing feature screens across US1-US8 (inventory, alerting, replenishment, forecasting, transfers, analytics, admin) are in scope now.
+- Q: Who can trigger sample-data seeding, and how is "non-production" enforced? → A: Both — the action requires the `admin` role AND an explicit non-production environment safeguard (defense-in-depth), consistent with existing RBAC-gated admin actions on the platform.
+- Q: What happens if sample-data seeding is interrupted partway through? → A: Resumable/idempotent — re-running the seeding action safely completes any missing records after a partial failure; no automatic transactional rollback across domains is required.
+- Q: Is an explicit "clear/reset sample data" action required in v1, separate from idempotent re-seeding? → A: Yes — provide an explicit action to remove all previously seeded sample data, independent of a full database reset, gated by the same admin role + non-production safeguard as seeding itself.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -40,6 +43,7 @@ As a product stakeholder, pilot customer, or new team member, I want the applica
 1. **Given** an empty or reset non-production environment, **When** the sample-data seeding action is run, **Then** the system is populated with multiple stores, products, and their associated inventory, alert, and recommendation records reflecting real-world retail patterns.
 2. **Given** sample data has already been seeded, **When** the seeding action is run again, **Then** no duplicate records are created.
 3. **Given** a production environment, **When** someone attempts to run the seeding action, **Then** the system prevents it or requires an explicit non-production confirmation.
+4. **Given** sample data has been seeded, **When** an admin runs the clear/reset action, **Then** all previously seeded sample data is removed while any genuine non-seed data remains untouched.
 
 ---
 
@@ -91,7 +95,7 @@ As a user who prefers dark mode (e.g., in low-light environments) or light mode,
 ### Edge Cases
 
 - What happens when the sample-data seeding action is triggered against an environment that already contains real (non-seed) operational data?
-- How does the system behave if seeding is interrupted partway through (partial data applied)?
+- If seeding is interrupted partway through, re-running the seeding action resolves it by completing only the missing records (resumable/idempotent), without requiring manual cleanup or automatic rollback.
 - What happens on very narrow viewports (e.g., 320px wide) for data-dense screens such as the analytics dashboard?
 - How are colorful status/severity indicators (e.g., alert severity, priority rank) distinguished for colorblind users beyond color alone?
 - What happens when a user has an OS-level "reduced motion" or "high contrast" accessibility preference active alongside their theme selection?
@@ -102,14 +106,15 @@ As a user who prefers dark mode (e.g., in low-light environments) or light mode,
 
 - **FR-001**: System MUST provide a repeatable, on-demand way to populate the application with realistic sample retail data representing real-world store and product patterns, using fictitious but realistic-looking identifiers (e.g., `STORE-CHICAGO-014`, `SKU-COFFEE-12OZ`) across multiple regions and product categories; descriptive Store/Product reference data (human-readable name, city/region, category) beyond these identifiers is explicitly out of scope for this feature and is planned as a fast-follow.
 - **FR-002**: Sample data MUST populate every existing operational domain (inventory positions, product-location policies, stock alerts, replenishment recommendations, demand forecasts, transfer suggestions, store priority profiles, audit history) so no existing dashboard appears empty after seeding.
-- **FR-003**: Sample-data seeding MUST be idempotent — running it multiple times MUST NOT create duplicate records.
-- **FR-004**: Sample-data seeding MUST be restricted to non-production environments and MUST require an explicit confirmation or environment-based safeguard before running.
+- **FR-003**: Sample-data seeding MUST be idempotent — running it multiple times MUST NOT create duplicate records, and re-running after a partial or interrupted seeding failure MUST safely complete only the missing records without requiring automatic transactional rollback.
+- **FR-004**: Sample-data seeding MUST be restricted to users with the `admin` role AND MUST be blocked unless an explicit non-production environment safeguard is in place, so no single factor (role alone or environment alone) is sufficient to trigger it.
 - **FR-005**: The seeded sample dataset MUST reach pilot scale consistent with the v1 platform's target scale (1,000+ stores, 100,000+ distinct SKUs across the catalog, per spec 001), with each store carrying a realistic per-store assortment rather than a full store-by-SKU cross-product, so total record volume stays operationally reasonable while still exercising performance and UX at scale.
 - **FR-006**: The application UI MUST apply a consistent, modern, colorful visual design system (shared color palette, typography, spacing, iconography) across all existing feature screens (inventory, alerting, replenishment, forecasting, transfers, analytics, admin).
 - **FR-007**: The UI MUST remain fully responsive, with no cut-off content, overlapping elements, or required horizontal scrolling for primary workflows, across common desktop, tablet, and mobile breakpoints.
 - **FR-008**: The UI MUST preserve visual clarity and adequate color contrast for all colorful elements (status badges, charts, alerts) in both dark and light themes.
 - **FR-009**: Users MUST be able to toggle between dark and light themes, and their preference MUST persist across sessions.
 - **FR-010**: Status and severity indicators MUST remain distinguishable to colorblind users through means beyond color alone (e.g., icons, text labels, or patterns).
+- **FR-011**: System MUST provide an explicit action to remove all previously seeded sample data, independent of a full database reset, gated by the same `admin` role and non-production environment safeguard required for seeding (FR-004), and MUST leave any genuine non-seed data untouched.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -138,3 +143,4 @@ As a user who prefers dark mode (e.g., in low-light environments) or light mode,
 - Existing accessibility commitments (keyboard navigation, adequate contrast) continue to apply and are reinforced, not relaxed, by the new visual design.
 - Descriptive, human-readable Store/Product reference data (names, city/region, category beyond the identifier) is explicitly deferred to a fast-follow feature and is not delivered by this spec.
 - "Pilot scale" (1,000+ stores, 100,000+ distinct SKUs) refers to overall catalog and network size; individual stores carry a realistic per-store assortment rather than every SKU at every location, keeping total generated records operationally reasonable.
+- Seeded records are distinguishably tagged or traceable as sample/seed-origin data (e.g., a marker attributable to the seeding source), so the clear/reset action (FR-011) can reliably remove only sample data without affecting genuine non-seed records.
