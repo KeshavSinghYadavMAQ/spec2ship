@@ -1,0 +1,105 @@
+openapi: 3.0.3
+info:
+  title: Sample Data Admin API (extends Retail Replenishment V1 API)
+  version: "1.0"
+  description: >
+    Incremental API contract for feature 002 (specs/002-seed-data-responsive-ui/spec.md).
+    Adds admin-only sample-data seeding/clear/status endpoints to the existing V1 API
+    (see specs/001-retail-replenishment-v1/contracts/openapi.yaml). All paths require the
+    `admin` role (FR-004, FR-011) AND a non-production deployment environment; requests are
+    rejected with 403 if either condition fails.
+servers:
+  - url: /v1
+tags:
+  - name: admin-sample-data
+    description: US1 - Sample-data lifecycle (FR-001 to FR-005, FR-011)
+
+paths:
+  /admin/sample-data/seed:
+    post:
+      tags: [admin-sample-data]
+      summary: Seed the environment with realistic, pilot-scale sample retail data
+      description: >
+        Idempotent (FR-003): safe to call multiple times. Re-running after a partial/interrupted
+        run completes only the missing records; already-seeded records are skipped, no automatic
+        rollback occurs.
+      responses:
+        "202":
+          description: Seeding started or resumed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeedRunSummary"
+        "403":
+          description: Caller lacks the admin role, or the environment is production
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /admin/sample-data/status:
+    get:
+      tags: [admin-sample-data]
+      summary: Get the status of the most recent seeding run
+      responses:
+        "200":
+          description: Last known seeding run status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeedRunSummary"
+        "404":
+          description: No seeding run has ever been executed in this environment
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /admin/sample-data:
+    delete:
+      tags: [admin-sample-data]
+      summary: Remove all previously seeded sample data
+      description: >
+        Removes exactly the records tracked in the seed-record ledger (FR-011); genuine
+        non-seed data is left untouched. Independent of a full database reset.
+      responses:
+        "200":
+          description: Sample data removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClearRunSummary"
+        "403":
+          description: Caller lacks the admin role, or the environment is production
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+components:
+  schemas:
+    SeedRunSummary:
+      type: object
+      required: [seed_batch_id, status, counts_by_entity_type, started_at]
+      properties:
+        seed_batch_id: { type: string, format: uuid }
+        status: { type: string, enum: [in_progress, completed, partially_completed] }
+        counts_by_entity_type:
+          type: object
+          additionalProperties: { type: integer }
+          description: Number of ledger-tracked records created so far, keyed by entity_type.
+        started_at: { type: string, format: date-time }
+        completed_at: { type: string, format: date-time, nullable: true }
+    ClearRunSummary:
+      type: object
+      required: [removed_counts_by_entity_type, cleared_at]
+      properties:
+        removed_counts_by_entity_type:
+          type: object
+          additionalProperties: { type: integer }
+        cleared_at: { type: string, format: date-time }
+    ProblemDetail:
+      type: object
+      required: [title, status, detail]
+      properties:
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
