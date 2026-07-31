@@ -225,7 +225,7 @@ As a regional inventory planner, I can prioritize stores for item restoration ba
 - **SC-005**: Forecast-enabled categories improve fill rate by at least 8 percentage points over baseline.
 - **SC-006**: At least 25% of shortage cases in pilot regions are mitigated through transfer suggestions.
 - **SC-007**: Users complete critical dashboard triage workflows in under 2 minutes for at least 90% of observed sessions.
-- **SC-008**: Monthly pilot operating cost remains within predefined budget guardrails while meeting service-level goals.
+- **SC-008**: Monthly pilot operating cost remains within a $15,000/month Azure infrastructure ceiling (compute, storage, cache, messaging) at pilot scope, with per-event ingestion cost tracked against a $0.00005-per-event assumption, while meeting service-level goals.
 - **SC-009**: Platform maintains at least 99.9% monthly uptime for core inventory, alerting, and replenishment workflows, measured against a single-region managed-service deployment.
 
 ## Assumptions

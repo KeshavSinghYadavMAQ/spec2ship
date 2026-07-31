@@ -140,6 +140,7 @@
 - [ ] T055 [US3] Implement `GET /v1/replenishment/recommendations` and decision endpoints in `backend/src/api/routers/replenishment.py`
 - [ ] T056 [P] [US3] Build recommendation review panel with rationale display and accept/override/dismiss actions in `frontend/src/features/replenishment/RecommendationPanel.tsx`
 - [ ] T057 [US3] Wire replenishment feature to API via TanStack Query hooks in `frontend/src/features/replenishment/hooks/useRecommendations.ts`
+- [ ] T105 [US3] Capture operator actionability rating on the recommendation decision endpoint/UI (extend `POST /v1/replenishment/recommendations/{id}/decision` schema + `RecommendationPanel.tsx`) to measure SC-004 in `backend/src/api/routers/replenishment.py` and `frontend/src/features/replenishment/RecommendationPanel.tsx`
 
 **Checkpoint**: All P1 stories (US1–US3) independently functional — MVP.
 
@@ -162,6 +163,7 @@
 - [ ] T061 [US4] Implement `DemandForecast` model in `backend/src/domain/forecasting/models.py`
 - [ ] T062 [US4] Implement trend/seasonality/promotion-aware forecasting engine and error indicators in `backend/src/domain/forecasting/engine.py` (FR-006, FR-007)
 - [ ] T063 [US4] Implement `GET /v1/forecasts` endpoint in `backend/src/api/routers/forecasting.py`
+- [ ] T106 [US4] Implement MAF/Copilot SDK forecast-narration agent wrapper (explanation only, not the projection logic) in `backend/src/agents/forecast_explainer.py` (per research.md Agent orchestration decision)
 - [ ] T064 [P] [US4] Build forecast review view with quality/error indicators in `frontend/src/features/forecasting/ForecastView.tsx`
 - [ ] T065 [US4] Wire forecasting feature to API via TanStack Query hooks in `frontend/src/features/forecasting/hooks/useForecasts.ts`
 
@@ -184,7 +186,7 @@
 ### Implementation for User Story 5
 
 - [ ] T069 [US5] Implement `TransferSuggestion` model in `backend/src/domain/transfer_balance/models.py`
-- [ ] T070 [US5] Implement imbalance detection + feasibility-constrained transfer engine reading `StorePriorityProfile` in `backend/src/domain/transfer_balance/engine.py` (FR-008, FR-009, FR-020)
+- [ ] T070 [US5] Implement imbalance detection + feasibility-constrained transfer engine reading `StorePriorityProfile` in `backend/src/domain/transfer_balance/engine.py` (FR-008, FR-009, FR-020; uses the Foundational stub ranking from T022 until US8's full scoring service — T084 — is available)
 - [ ] T071 [US5] Implement `GET /v1/transfers/suggestions` and status-update endpoints in `backend/src/api/routers/transfers.py`
 - [ ] T072 [P] [US5] Build transfer suggestion list with feasibility/priority display and status actions in `frontend/src/features/transfer-balance/TransferSuggestions.tsx`
 - [ ] T073 [US5] Wire transfer-balance feature to API via TanStack Query hooks in `frontend/src/features/transfer-balance/hooks/useTransfers.ts`
@@ -232,6 +234,7 @@
 
 - [ ] T084 [US8] Implement region-based and consumption-based priority scoring service in `backend/src/domain/transfer_balance/priority_service.py` (FR-019, FR-021)
 - [ ] T085 [US8] Implement `GET /v1/store-priority/profiles` and `POST /v1/store-priority/rules` endpoints in `backend/src/api/routers/store_priority.py` (FR-020)
+- [ ] T107 [US8] Implement MAF/Copilot SDK priority-factor explanation agent wrapper (explanation only, not the scoring decision) in `backend/src/agents/store_priority_explainer.py` (per research.md Agent orchestration decision)
 - [ ] T086 [P] [US8] Build store priority review view with contributing-factor breakdown in `frontend/src/features/transfer-balance/StorePriorityView.tsx`
 - [ ] T087 [US8] Wire store-priority feature to API via TanStack Query hooks in `frontend/src/features/transfer-balance/hooks/useStorePriority.ts`
 
@@ -275,7 +278,8 @@
 - [ ] T101 [P] Validate structured logs/metrics/traces and RBAC/audit coverage across all domains
 - [ ] T102 Security hardening pass (RBAC enforcement, input validation, rate-limit abuse testing — OWASP Top 10 review)
 - [ ] T103 Run [quickstart.md](./quickstart.md) validation end-to-end
-- [ ] T104 Validate SC-009 (99.9% uptime design, zone-redundancy configuration) and SC-008 (cost guardrail dashboard)
+- [ ] T104 Validate SC-009 (99.9% uptime design, zone-redundancy configuration) and SC-008 (cost guardrail dashboard against the $15,000/month ceiling and $0.00005/event assumption)
+- [ ] T108 [P] Run a WCAG 2.2 AA accessibility audit (automated axe-core scan in CI + manual review) across alerts, recommendations, approvals, and dashboards in `frontend/tests/e2e/accessibility.spec.ts` (Constitution IV)
 
 ---
 

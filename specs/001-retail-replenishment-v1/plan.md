@@ -26,7 +26,7 @@ Deliver the V1 retail replenishment platform: real-time stock visibility (US1), 
 
 **Performance Goals**: Stock position visibility within 60s for 95% of updates (SC-001); alert notification within 2 minutes for 90% of breaches (SC-003); dashboard triage workflows completed in under 2 minutes for 90% of sessions (SC-007); 99.9% monthly platform uptime (SC-009)
 
-**Constraints**: Enterprise-scale volume (1,000+ stores, 100,000+ SKUs per Clarifications) driving throughput/storage sizing; single-language (English) v1 UI with externalized text; queue-and-replay resilience for upstream source outages (FR-022); threshold-edit lock during in-flight evaluations (FR-023); per-source-system ingestion rate limiting with retryable 429 responses (FR-024); monthly pilot operating cost within predefined budget guardrails (SC-008, Constitution VI)
+**Constraints**: Enterprise-scale volume (1,000+ stores, 100,000+ SKUs per Clarifications) driving throughput/storage sizing; single-language (English) v1 UI with externalized text; queue-and-replay resilience for upstream source outages (FR-022); threshold-edit lock during in-flight evaluations (FR-023); per-source-system ingestion rate limiting with retryable 429 responses (FR-024); monthly pilot operating cost ceiling of $15,000/month and a $0.00005-per-ingested-event budget assumption (SC-008, Constitution VI)
 
 **Scale/Scope**: 8 user stories (3 P1, 4 P2, 1 P3), 24 functional requirements, 10 key entities, RBAC across 5 roles, enterprise-scale data volume (1,000+ stores, 100,000+ SKUs)
 
@@ -39,7 +39,7 @@ Deliver the V1 retail replenishment platform: real-time stock visibility (US1), 
 - [x] Harness-First Validation: Harness scenarios (happy path, failure path, data-quality edge cases) are planned per domain under `backend/tests/harness` before implementation.
 - [x] Production React Experience: React 18 + Fluent UI v9 delivers responsive, dark/light-themed, accessible (WCAG 2.2 AA) UI for alerts, recommendations, approvals, and dashboards.
 - [x] Operational Trustworthiness: Structured logging/metrics/traces, RBAC (FR-013), auditable logs (FR-014, FR-018), per-source ingestion rate limiting (FR-024), and a 99.9% monthly uptime target (SC-009) are planned across all domains.
-- [x] Azure Well-Architected and Cost Efficiency: Azure Container Apps + managed Azure SQL Database/Redis/Service Bus with autoscaling boundaries, single-region reliability design meeting SC-009, and environment tiering; cost guardrails tracked per SC-008 and FR-015.
+- [x] Azure Well-Architected and Cost Efficiency: Azure Container Apps + managed Azure SQL Database/Redis/Service Bus with autoscaling boundaries, single-region reliability design meeting SC-009, and environment tiering; cost guardrails tracked per SC-008 ($15,000/month pilot ceiling, $0.00005/event ingestion assumption) and FR-015.
 
 **Post-Design Re-check (after Phase 1)**: All six gates re-validated against `research.md`, `data-model.md`, and
 `contracts/openapi.yaml`. No new violations introduced; no entries required in Complexity Tracking.

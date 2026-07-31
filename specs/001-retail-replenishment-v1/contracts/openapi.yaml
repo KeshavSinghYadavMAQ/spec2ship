@@ -162,6 +162,10 @@ paths:
               properties:
                 decision: { type: string, enum: [accepted, overridden, dismissed] }
                 override_reason: { type: string }
+                actionability_rating:
+                  type: string
+                  enum: [actionable, not_actionable]
+                  description: Operator feedback used to measure SC-004
       responses:
         "200": { description: Decision recorded and audited }
 

@@ -112,6 +112,19 @@ remain.
   Azure Functions for all backend logic (poor fit for long-lived agent orchestration sessions and stateful
   evaluation locks).
 
+## Decision: Cost guardrails — $15,000/month pilot ceiling with $0.00005/event ingestion assumption
+
+- **Decision**: Set an explicit pilot-phase monthly Azure infrastructure spend ceiling of $15,000 (Container Apps,
+  Azure SQL Database, Redis, Service Bus, Static Web Apps combined), and a per-ingested-event budget assumption of
+  $0.00005 to keep FR-012/FR-022 ingestion costs predictable as volume scales toward the enterprise-scale target.
+- **Rationale**: Constitution VI requires cost-impacting decisions to include measurable targets (estimated
+  monthly spend ceilings and per-transaction budget assumptions), not just qualitative "guardrails." A pilot-scope
+  ceiling (selected stores/categories per Assumptions) sized well below full enterprise-scale cost keeps the
+  pilot affordable while the per-event assumption gives a concrete unit-economics check as ingestion volume grows.
+- **Alternatives considered**: No explicit numeric ceiling (rejected — fails Constitution VI's measurable-target
+  requirement); a per-store monthly ceiling instead of an aggregate figure (rejected for v1 — aggregate is simpler
+  to track against a single Azure Cost Management budget alert at pilot scope).
+
 ## Decision: Ingestion rate limiting — per-source token bucket in FastAPI + Redis
 
 - **Decision**: Enforce FR-024's per-source-system rate limit as FastAPI middleware backed by a Redis token-bucket
