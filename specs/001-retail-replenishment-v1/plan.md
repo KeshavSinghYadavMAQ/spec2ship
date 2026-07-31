@@ -8,7 +8,7 @@
 
 ## Summary
 
-Deliver the V1 retail replenishment platform: real-time stock visibility (US1), low/out-of-stock alerting (US2), explainable replenishment recommendations (US3), demand forecasting (US4), multi-store transfer balancing (US5), operational analytics dashboards (US6), an admin panel for product-location thresholds (US7), and region/consumption-based store restoration priority (US8). The backend is a Python service layer orchestrated with Microsoft Agent Framework and the Copilot SDK for explainable reasoning (rationale generation, prioritization narration), backed by durable relational storage and a message-queue-based ingestion pipeline that satisfies the queue-and-replay resilience requirement (FR-022) at enterprise scale (1,000+ stores, 100,000+ SKUs, per Clarifications). The frontend is a responsive React application with first-class dark/light theming, delivered as a single-language (English) v1 experience with externalized UI text for future localization.
+Deliver the V1 retail replenishment platform: real-time stock visibility (US1), low/out-of-stock alerting (US2), explainable replenishment recommendations (US3), demand forecasting (US4), multi-store transfer balancing (US5), operational analytics dashboards (US6), an admin panel for product-location thresholds (US7), and region/consumption-based store restoration priority (US8). The backend is a Python service layer orchestrated with Microsoft Agent Framework and the Copilot SDK for explainable reasoning (rationale generation, prioritization narration), backed by durable relational storage and a message-queue-based ingestion pipeline that satisfies the queue-and-replay resilience requirement (FR-022) at enterprise scale (1,000+ stores, 100,000+ SKUs, per Clarifications). The frontend is a responsive React application with first-class dark/light theming, delivered as a single-language (English) v1 experience with externalized UI text for future localization. See [architecture.md](./architecture.md) for the system context and component diagram.
 
 ## Technical Context
 
@@ -54,6 +54,7 @@ specs/001-retail-replenishment-v1/
 ├── research.md          # Phase 0 output (/speckit.plan command)
 ├── data-model.md        # Phase 1 output (/speckit.plan command)
 ├── quickstart.md        # Phase 1 output (/speckit.plan command)
+├── architecture.md      # System architecture diagram and component notes
 ├── contracts/           # Phase 1 output (/speckit.plan command)
 └── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
 ```
