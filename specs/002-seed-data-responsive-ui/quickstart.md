@@ -55,9 +55,9 @@ even when calling with a valid `admin` role (FR-004 defense-in-depth).
 1. Toggle the theme switch in the app header between light and dark. Expected: the preference
    persists across a page reload (FR-009), and every screen remains legible with no low-contrast
    text or broken visuals (FR-008).
-2. Resize the browser to 375px (mobile), 768px (tablet), and 1440px (desktop) widths on each
-   in-scope screen. Expected: no horizontal scrolling or clipped content for primary workflows
-   (FR-007, SC-003).
+2. Resize the browser to 360px (mobile, the minimum supported width), 768px (tablet), and 1440px
+   (desktop) widths on each in-scope screen. Expected: no horizontal scrolling or clipped content
+   for primary workflows (FR-007, SC-003).
 3. Compare two different screens side-by-side. Expected: shared color palette, typography, and
    component styling (buttons, cards, status badges, charts) look and behave consistently
    (FR-006).
@@ -68,5 +68,6 @@ even when calling with a valid `admin` role (FR-004 defense-in-depth).
 
 - Backend: `pytest backend/tests/harness/sample_data` — covers idempotent re-seeding, resumption
   after a simulated partial failure, and the non-production/role gate failure paths.
-- Frontend: `npx playwright test tests/e2e/responsive` — covers the three breakpoints and
-  axe-core WCAG AA contrast checks in both themes across all in-scope screens.
+- Frontend: `npx playwright test tests/e2e/responsive` — covers the three breakpoints (360px
+  minimum mobile width, tablet, desktop) and axe-core WCAG AA contrast checks in both themes
+  across all in-scope screens.

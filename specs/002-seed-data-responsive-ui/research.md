@@ -78,8 +78,9 @@ All items below were resolved directly (no external research agents were require
 
 - **Decision**: Reuse the existing Playwright + `@axe-core/playwright` frontend dependencies
   (already in `package.json`) to add a harness suite that loads every in-scope screen at three
-  fixed viewport presets (375px mobile, 768px tablet, 1440px desktop) and asserts no horizontal
-  scroll/clipped content plus zero axe-core WCAG AA violations in both themes.
+  fixed viewport presets (360px mobile — the clarified minimum supported width, 768px tablet,
+  1440px desktop) and asserts no horizontal scroll/clipped content plus zero axe-core WCAG AA
+  violations in both themes.
 - **Rationale**: No new tooling required; directly satisfies the Harness-First Validation
   constitution principle for US2-US4.
 - **Alternatives considered**: Manual QA only — rejected, not repeatable or CI-enforceable.

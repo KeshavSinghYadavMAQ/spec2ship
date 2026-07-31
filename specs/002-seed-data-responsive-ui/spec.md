@@ -27,6 +27,8 @@
 - Q: Who can trigger sample-data seeding, and how is "non-production" enforced? → A: Both — the action requires the `admin` role AND an explicit non-production environment safeguard (defense-in-depth), consistent with existing RBAC-gated admin actions on the platform.
 - Q: What happens if sample-data seeding is interrupted partway through? → A: Resumable/idempotent — re-running the seeding action safely completes any missing records after a partial failure; no automatic transactional rollback across domains is required.
 - Q: Is an explicit "clear/reset sample data" action required in v1, separate from idempotent re-seeding? → A: Yes — provide an explicit action to remove all previously seeded sample data, independent of a full database reset, gated by the same admin role + non-production safeguard as seeding itself.
+- Q: What happens if a to-be-seeded identifier collides with a pre-existing, genuine (non-seed) record? → A: Fail fast — abort seeding that record (or the run) and surface an error; never overwrite or silently skip real data.
+- Q: What is the minimum supported mobile viewport width for the responsive UI? → A: 360px minimum (common modern Android baseline).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -94,9 +96,9 @@ As a user who prefers dark mode (e.g., in low-light environments) or light mode,
 
 ### Edge Cases
 
-- What happens when the sample-data seeding action is triggered against an environment that already contains real (non-seed) operational data?
+- If a to-be-seeded identifier collides with a pre-existing, genuine (non-seed) record, seeding fails fast for that record (or the run) with a surfaced error, rather than overwriting or silently skipping the real data.
 - If seeding is interrupted partway through, re-running the seeding action resolves it by completing only the missing records (resumable/idempotent), without requiring manual cleanup or automatic rollback.
-- What happens on very narrow viewports (e.g., 320px wide) for data-dense screens such as the analytics dashboard?
+- The minimum supported mobile viewport width is 360px; data-dense screens such as the analytics dashboard remain usable at that width (e.g., via scrollable table/chart containers or stacked layouts) without breaking the overall page layout.
 - How are colorful status/severity indicators (e.g., alert severity, priority rank) distinguished for colorblind users beyond color alone?
 - What happens when a user has an OS-level "reduced motion" or "high contrast" accessibility preference active alongside their theme selection?
 
@@ -110,11 +112,12 @@ As a user who prefers dark mode (e.g., in low-light environments) or light mode,
 - **FR-004**: Sample-data seeding MUST be restricted to users with the `admin` role AND MUST be blocked unless an explicit non-production environment safeguard is in place, so no single factor (role alone or environment alone) is sufficient to trigger it.
 - **FR-005**: The seeded sample dataset MUST reach pilot scale consistent with the v1 platform's target scale (1,000+ stores, 100,000+ distinct SKUs across the catalog, per spec 001), with each store carrying a realistic per-store assortment rather than a full store-by-SKU cross-product, so total record volume stays operationally reasonable while still exercising performance and UX at scale.
 - **FR-006**: The application UI MUST apply a consistent, modern, colorful visual design system (shared color palette, typography, spacing, iconography) across all existing feature screens (inventory, alerting, replenishment, forecasting, transfers, analytics, admin).
-- **FR-007**: The UI MUST remain fully responsive, with no cut-off content, overlapping elements, or required horizontal scrolling for primary workflows, across common desktop, tablet, and mobile breakpoints.
+- **FR-007**: The UI MUST remain fully responsive, with no cut-off content, overlapping elements, or required horizontal scrolling for primary workflows, across common desktop, tablet, and mobile breakpoints down to a minimum supported mobile viewport width of 360px.
 - **FR-008**: The UI MUST preserve visual clarity and adequate color contrast for all colorful elements (status badges, charts, alerts) in both dark and light themes.
 - **FR-009**: Users MUST be able to toggle between dark and light themes, and their preference MUST persist across sessions.
 - **FR-010**: Status and severity indicators MUST remain distinguishable to colorblind users through means beyond color alone (e.g., icons, text labels, or patterns).
 - **FR-011**: System MUST provide an explicit action to remove all previously seeded sample data, independent of a full database reset, gated by the same `admin` role and non-production environment safeguard required for seeding (FR-004), and MUST leave any genuine non-seed data untouched.
+- **FR-012**: System MUST detect when a to-be-seeded identifier collides with a pre-existing, genuine (non-seed) record and MUST fail fast with a clear, surfaced error for that record (or the run), rather than overwriting or silently skipping the conflicting real data.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -127,7 +130,7 @@ As a user who prefers dark mode (e.g., in low-light environments) or light mode,
 
 - **SC-001**: A new stakeholder can view a fully populated, pilot-scale demo environment, showing realistic multi-store data across every existing dashboard, from a single seeding action completing in under 30 minutes, without any manual data entry.
 - **SC-002**: 100% of the application's primary screens display populated, realistic-looking records immediately after seeding, with no empty states in a seeded environment.
-- **SC-003**: All primary workflows remain fully usable, with no horizontal scrolling or obscured content, at common desktop, tablet, and mobile breakpoints.
+- **SC-003**: All primary workflows remain fully usable, with no horizontal scrolling or obscured content, at common desktop, tablet, and mobile breakpoints down to a minimum supported mobile viewport width of 360px.
 - **SC-004**: All in-scope screens meet at least WCAG AA color contrast standards in both dark and light themes.
 - **SC-005**: Users can switch themes in a single action, and the preference is automatically applied on their next visit 100% of the time.
 - **SC-006**: The full pilot-scale sample dataset can be regenerated from a single action, completing in under 30 minutes, without requiring engineering support.
