@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import uuid
 from datetime import UTC, datetime
+from typing import Any
 
+from pydantic import BaseModel
 from sqlalchemy import JSON, DateTime, String
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
@@ -24,9 +26,23 @@ class AuditLogEntry(Base):
     action: Mapped[str] = mapped_column(String(64))
     entity_type: Mapped[str] = mapped_column(String(64))
     entity_id: Mapped[str] = mapped_column(String(36))
-    before: Mapped[dict | None] = mapped_column(JSON, nullable=True)
-    after: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    before: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    after: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class AuditLogEntryRead(BaseModel):
+    id: str
+    actor_user_id: str
+    action: str
+    entity_type: str
+    entity_id: str
+    before: dict[str, Any] | None
+    after: dict[str, Any] | None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
 
 
 class AuditLogWriter:
@@ -40,8 +56,8 @@ class AuditLogWriter:
         action: str,
         entity_type: str,
         entity_id: str,
-        before: dict | None = None,
-        after: dict | None = None,
+        before: dict[str, Any] | None = None,
+        after: dict[str, Any] | None = None,
     ) -> AuditLogEntry:
         entry = AuditLogEntry(
             id=str(uuid.uuid4()),
@@ -56,3 +72,13 @@ class AuditLogWriter:
         self._session.add(entry)
         self._session.flush()
         return entry
+
+    def list_entries(
+        self, *, entity_type: str | None = None, entity_id: str | None = None
+    ) -> list[AuditLogEntry]:
+        query = self._session.query(AuditLogEntry)
+        if entity_type:
+            query = query.filter_by(entity_type=entity_type)
+        if entity_id:
+            query = query.filter_by(entity_id=entity_id)
+        return query.order_by(AuditLogEntry.created_at.desc()).all()

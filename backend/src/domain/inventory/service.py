@@ -9,7 +9,11 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from src.domain.inventory.integration_event import IntegrationEventInput, IntegrationEventService
+from src.domain.inventory.integration_event import (
+    IntegrationEvent,
+    IntegrationEventInput,
+    IntegrationEventService,
+)
 from src.domain.inventory.models import InventoryPosition, InventoryPositionRepository
 
 
@@ -24,5 +28,7 @@ class InventoryService:
     ) -> list[InventoryPosition]:
         return self._repo.list(sku_id=sku_id, location_id=location_id)
 
-    def ingest_event(self, event_input: IntegrationEventInput, *, source_unavailable: bool = False):
+    def ingest_event(
+        self, event_input: IntegrationEventInput, *, source_unavailable: bool = False
+    ) -> IntegrationEvent:
         return self._event_service.ingest(event_input, source_unavailable=source_unavailable)

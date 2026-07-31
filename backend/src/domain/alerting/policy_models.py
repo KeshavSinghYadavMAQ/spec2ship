@@ -8,6 +8,10 @@ threshold configuration.
 
 from __future__ import annotations
 
+from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel
 from sqlalchemy import JSON, Boolean, DateTime, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -30,5 +34,25 @@ class ProductLocationPolicy(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     edit_lock_held: Mapped[bool] = mapped_column(Boolean, default=False)
     updated_by: Mapped[str | None] = mapped_column(String(128), nullable=True)
-    updated_at: Mapped[str | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    change_history: Mapped[list | None] = mapped_column(JSON, nullable=True, default=list)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    change_history: Mapped[list[Any] | None] = mapped_column(JSON, nullable=True, default=list)
+
+
+class ProductLocationPolicyRead(BaseModel):
+    id: str
+    sku_id: str
+    location_id: str
+    low_stock_threshold: int
+    out_of_stock_threshold: int
+    reorder_point: int
+    min_qty: int
+    max_qty: int
+    safety_stock: int
+    is_active: bool
+    edit_lock_held: bool
+    updated_by: str | None
+    updated_at: datetime | None
+    change_history: list[Any] | None
+
+    model_config = {"from_attributes": True}
+

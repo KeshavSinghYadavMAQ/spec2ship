@@ -2,7 +2,8 @@
 
 `GET /v1/replenishment/recommendations` and
 `POST /v1/replenishment/recommendations/{id}/decision` (FR-005). The decision endpoint
-also captures an optional operator `actionability_rating` (T105) used to measure SC-004.
+also captures an optional operator `actionability_rating` (T105) used to measure SC-004
+and writes an audit trail entry (FR-014: "auditable logs for ... recommendations").
 """
 
 from __future__ import annotations
@@ -12,6 +13,8 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
+from src.domain.admin.audit import AuditLogWriter
+from src.domain.admin.rbac import CurrentUser, Role, require_role
 from src.domain.replenishment.models import (
     ActionabilityRating,
     RecommendationStatus,
@@ -48,6 +51,7 @@ async def decide_recommendation(
     recommendation_id: str,
     body: DecisionRequest,
     session: Session = Depends(get_db_session),
+    current_user: CurrentUser = Depends(require_role(*Role)),
 ) -> ReplenishmentRecommendationRead:
     def _decide() -> ReplenishmentRecommendationRead:
         repo = ReplenishmentRecommendationRepository(session)
@@ -58,11 +62,21 @@ async def decide_recommendation(
             raise HTTPException(
                 status_code=422, detail="override_reason is required when decision is 'overridden'"
             )
+        before_status = recommendation.status
         recommendation.status = body.decision.value
         recommendation.override_reason = body.override_reason
         if body.actionability_rating is not None:
             recommendation.actionability_rating = body.actionability_rating.value
         session.flush()
+
+        AuditLogWriter(session).record(
+            actor_user_id=current_user.user_id,
+            action="replenishment_recommendation_decision",
+            entity_type="replenishment_recommendation",
+            entity_id=recommendation.id,
+            before={"status": before_status},
+            after={"status": recommendation.status, "override_reason": recommendation.override_reason},
+        )
         return ReplenishmentRecommendationRead.model_validate(recommendation)
 
     return await run_in_threadpool(_decide)

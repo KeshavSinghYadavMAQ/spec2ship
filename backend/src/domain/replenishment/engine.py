@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, timedelta
+from typing import Any
 
 from src.agents.replenishment_explainer import ReplenishmentExplainerAgent
 from src.domain.alerting.policy_models import ProductLocationPolicy
@@ -24,7 +25,7 @@ class ReorderDecision:
     should_reorder: bool
     recommended_quantity: int
     recommended_by_date: date
-    factors: dict
+    factors: dict[str, Any]
 
 
 def _lead_time_days(policy: ProductLocationPolicy) -> int:

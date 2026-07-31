@@ -11,6 +11,7 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel, Field
 from sqlalchemy import JSON, DateTime, String
@@ -43,7 +44,7 @@ class IntegrationEvent(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     source_system: Mapped[str] = mapped_column(String(64))
     event_type: Mapped[str] = mapped_column(String(32))
-    payload: Mapped[dict] = mapped_column(JSON)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON)
     processing_state: Mapped[str] = mapped_column(String(32), default=ProcessingState.QUEUED)
     received_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     applied_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -56,7 +57,7 @@ class IntegrationEventInput(BaseModel):
     location_id: str
     shelf_delta: int = 0
     backroom_delta: int = 0
-    metadata: dict = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 def _signed_deltas(event_type: EventType, shelf_delta: int, backroom_delta: int) -> tuple[int, int]:

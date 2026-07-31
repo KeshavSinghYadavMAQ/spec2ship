@@ -17,9 +17,11 @@ from src.domain.admin.audit import AuditLogEntry  # noqa: F401
 from src.domain.admin.rbac import UserRoleAssignment  # noqa: F401
 from src.domain.alerting.models import StockAlert  # noqa: F401
 from src.domain.alerting.policy_models import ProductLocationPolicy  # noqa: F401
+from src.domain.forecasting.models import DemandForecast  # noqa: F401
 from src.domain.inventory.integration_event import IntegrationEvent  # noqa: F401
 from src.domain.inventory.models import InventoryPosition  # noqa: F401
 from src.domain.replenishment.models import ReplenishmentRecommendation  # noqa: F401
+from src.domain.transfer_balance.models import TransferSuggestion  # noqa: F401
 from src.domain.transfer_balance.priority_models import StorePriorityProfile  # noqa: F401
 from src.infrastructure.config import get_settings
 from src.infrastructure.db import Base

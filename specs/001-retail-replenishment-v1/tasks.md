@@ -154,18 +154,18 @@
 
 ### Tests and Harness for User Story 4 (REQUIRED) ⚠️
 
-- [ ] T058 [P] [US4] Contract test `GET /v1/forecasts` in `backend/tests/contract/test_forecasts.py`
-- [ ] T059 [P] [US4] Integration test forecast generation with seasonal/promotion adjustment in `backend/tests/integration/test_forecasting_flow.py`
-- [ ] T060 [US4] Harness scenario — happy path (store/SKU projections), failure path (insufficient history), data-quality edge case (promotion-driven demand spike) in `backend/tests/harness/test_forecasting_harness.py`
+- [X] T058 [P] [US4] Contract test `GET /v1/forecasts` in `backend/tests/contract/test_forecasts.py`
+- [X] T059 [P] [US4] Integration test forecast generation with seasonal/promotion adjustment in `backend/tests/integration/test_forecasting_flow.py`
+- [X] T060 [US4] Harness scenario — happy path (store/SKU projections), failure path (insufficient history), data-quality edge case (promotion-driven demand spike) in `backend/tests/harness/test_forecasting_harness.py`
 
 ### Implementation for User Story 4
 
-- [ ] T061 [US4] Implement `DemandForecast` model in `backend/src/domain/forecasting/models.py`
-- [ ] T062 [US4] Implement trend/seasonality/promotion-aware forecasting engine and error indicators in `backend/src/domain/forecasting/engine.py` (FR-006, FR-007)
-- [ ] T063 [US4] Implement `GET /v1/forecasts` endpoint in `backend/src/api/routers/forecasting.py`
-- [ ] T106 [US4] Implement MAF/Copilot SDK forecast-narration agent wrapper (explanation only, not the projection logic) in `backend/src/agents/forecast_explainer.py` (per research.md Agent orchestration decision)
-- [ ] T064 [P] [US4] Build forecast review view with quality/error indicators in `frontend/src/features/forecasting/ForecastView.tsx`
-- [ ] T065 [US4] Wire forecasting feature to API via TanStack Query hooks in `frontend/src/features/forecasting/hooks/useForecasts.ts`
+- [X] T061 [US4] Implement `DemandForecast` model in `backend/src/domain/forecasting/models.py`
+- [X] T062 [US4] Implement trend/seasonality/promotion-aware forecasting engine and error indicators in `backend/src/domain/forecasting/engine.py` (FR-006, FR-007)
+- [X] T063 [US4] Implement `GET /v1/forecasts` endpoint in `backend/src/api/routers/forecasting.py`
+- [X] T106 [US4] Implement MAF/Copilot SDK forecast-narration agent wrapper (explanation only, not the projection logic) in `backend/src/agents/forecast_explainer.py` (per research.md Agent orchestration decision)
+- [X] T064 [P] [US4] Build forecast review view with quality/error indicators in `frontend/src/features/forecasting/ForecastView.tsx`
+- [X] T065 [US4] Wire forecasting feature to API via TanStack Query hooks in `frontend/src/features/forecasting/hooks/useForecasts.ts`
 
 **Checkpoint**: US1–US4 functional.
 
@@ -179,17 +179,17 @@
 
 ### Tests and Harness for User Story 5 (REQUIRED) ⚠️
 
-- [ ] T066 [P] [US5] Contract test `GET /v1/transfers/suggestions` and status-update endpoint in `backend/tests/contract/test_transfers.py`
-- [ ] T067 [P] [US5] Integration test overstock/shortage balancing journey in `backend/tests/integration/test_transfer_flow.py`
-- [ ] T068 [US5] Harness scenario — happy path (transfer recommendation generated), failure path (infeasible transfer excluded), data-quality edge case (conflicting store priority signals) in `backend/tests/harness/test_transfer_harness.py`
+- [X] T066 [P] [US5] Contract test `GET /v1/transfers/suggestions` and status-update endpoint in `backend/tests/contract/test_transfers.py`
+- [X] T067 [P] [US5] Integration test overstock/shortage balancing journey in `backend/tests/integration/test_transfer_flow.py`
+- [X] T068 [US5] Harness scenario — happy path (transfer recommendation generated), failure path (infeasible transfer excluded), data-quality edge case (conflicting store priority signals) in `backend/tests/harness/test_transfer_harness.py`
 
 ### Implementation for User Story 5
 
-- [ ] T069 [US5] Implement `TransferSuggestion` model in `backend/src/domain/transfer_balance/models.py`
-- [ ] T070 [US5] Implement imbalance detection + feasibility-constrained transfer engine reading `StorePriorityProfile` in `backend/src/domain/transfer_balance/engine.py` (FR-008, FR-009, FR-020; uses the Foundational stub ranking from T022 until US8's full scoring service — T084 — is available)
-- [ ] T071 [US5] Implement `GET /v1/transfers/suggestions` and status-update endpoints in `backend/src/api/routers/transfers.py`
-- [ ] T072 [P] [US5] Build transfer suggestion list with feasibility/priority display and status actions in `frontend/src/features/transfer-balance/TransferSuggestions.tsx`
-- [ ] T073 [US5] Wire transfer-balance feature to API via TanStack Query hooks in `frontend/src/features/transfer-balance/hooks/useTransfers.ts`
+- [X] T069 [US5] Implement `TransferSuggestion` model in `backend/src/domain/transfer_balance/models.py`
+- [X] T070 [US5] Implement imbalance detection + feasibility-constrained transfer engine reading `StorePriorityProfile` in `backend/src/domain/transfer_balance/engine.py` (FR-008, FR-009, FR-020; uses the Foundational stub ranking from T022 until US8's full scoring service — T084 — is available)
+- [X] T071 [US5] Implement `GET /v1/transfers/suggestions` and status-update endpoints in `backend/src/api/routers/transfers.py`
+- [X] T072 [P] [US5] Build transfer suggestion list with feasibility/priority display and status actions in `frontend/src/features/transfer-balance/TransferSuggestions.tsx`
+- [X] T073 [US5] Wire transfer-balance feature to API via TanStack Query hooks in `frontend/src/features/transfer-balance/hooks/useTransfers.ts`
 
 **Checkpoint**: US1–US5 functional.
 
@@ -203,16 +203,16 @@
 
 ### Tests and Harness for User Story 7 (REQUIRED) ⚠️
 
-- [ ] T074 [P] [US7] Contract test `GET`/`POST /v1/admin/product-location-policies` (incl. 409 edit-lock, 422 validation) in `backend/tests/contract/test_policies.py`
-- [ ] T075 [P] [US7] Integration test threshold edit → lock-during-evaluation → apply-next-cycle journey in `backend/tests/integration/test_policy_edit_lock.py`
-- [ ] T076 [US7] Harness scenario — happy path (threshold saved and applied), failure path (invalid/incomplete values rejected), data-quality edge case (edit attempted during in-flight evaluation) in `backend/tests/harness/test_policy_harness.py`
+- [X] T074 [P] [US7] Contract test `GET`/`POST /v1/admin/product-location-policies` (incl. 409 edit-lock, 422 validation) in `backend/tests/contract/test_policies.py`
+- [X] T075 [P] [US7] Integration test threshold edit → lock-during-evaluation → apply-next-cycle journey in `backend/tests/integration/test_policy_edit_lock.py`
+- [X] T076 [US7] Harness scenario — happy path (threshold saved and applied), failure path (invalid/incomplete values rejected), data-quality edge case (edit attempted during in-flight evaluation) in `backend/tests/harness/test_policy_harness.py`
 
 ### Implementation for User Story 7
 
-- [ ] T077 [US7] Implement threshold validation rules and edit-lock enforcement service in `backend/src/domain/alerting/policy_service.py` (FR-016, FR-017, FR-023)
-- [ ] T078 [US7] Implement `GET`/`POST /v1/admin/product-location-policies` endpoints with audit logging in `backend/src/api/routers/admin_policies.py` (FR-018)
-- [ ] T079 [P] [US7] Build admin threshold management panel with validation feedback and lock-state indicator in `frontend/src/features/admin/ProductLocationPolicyAdmin.tsx`
-- [ ] T080 [US7] Wire admin policy feature to API via TanStack Query hooks in `frontend/src/features/admin/hooks/usePolicies.ts`
+- [X] T077 [US7] Implement threshold validation rules and edit-lock enforcement service in `backend/src/domain/alerting/policy_service.py` (FR-016, FR-017, FR-023)
+- [X] T078 [US7] Implement `GET`/`POST /v1/admin/product-location-policies` endpoints with audit logging in `backend/src/api/routers/admin_policies.py` (FR-018)
+- [X] T079 [P] [US7] Build admin threshold management panel with validation feedback and lock-state indicator in `frontend/src/features/admin/ProductLocationPolicyAdmin.tsx`
+- [X] T080 [US7] Wire admin policy feature to API via TanStack Query hooks in `frontend/src/features/admin/hooks/usePolicies.ts`
 
 **Checkpoint**: US1–US5, US7 functional.
 
@@ -226,17 +226,17 @@
 
 ### Tests and Harness for User Story 8 (REQUIRED) ⚠️
 
-- [ ] T081 [P] [US8] Contract test `GET /v1/store-priority/profiles` and `POST /v1/store-priority/rules` in `backend/tests/contract/test_store_priority.py`
-- [ ] T082 [P] [US8] Integration test region/consumption-based ranking journey in `backend/tests/integration/test_priority_ranking.py`
-- [ ] T083 [US8] Harness scenario — happy path (stores ranked by configured factors), failure path (missing consumption data), data-quality edge case (conflicting region/consumption signals) in `backend/tests/harness/test_priority_harness.py`
+- [X] T081 [P] [US8] Contract test `GET /v1/store-priority/profiles` and `POST /v1/store-priority/rules` in `backend/tests/contract/test_store_priority.py`
+- [X] T082 [P] [US8] Integration test region/consumption-based ranking journey in `backend/tests/integration/test_priority_ranking.py`
+- [X] T083 [US8] Harness scenario — happy path (stores ranked by configured factors), failure path (missing consumption data), data-quality edge case (conflicting region/consumption signals) in `backend/tests/harness/test_priority_harness.py`
 
 ### Implementation for User Story 8
 
-- [ ] T084 [US8] Implement region-based and consumption-based priority scoring service in `backend/src/domain/transfer_balance/priority_service.py` (FR-019, FR-021)
-- [ ] T085 [US8] Implement `GET /v1/store-priority/profiles` and `POST /v1/store-priority/rules` endpoints in `backend/src/api/routers/store_priority.py` (FR-020)
-- [ ] T107 [US8] Implement MAF/Copilot SDK priority-factor explanation agent wrapper (explanation only, not the scoring decision) in `backend/src/agents/store_priority_explainer.py` (per research.md Agent orchestration decision)
-- [ ] T086 [P] [US8] Build store priority review view with contributing-factor breakdown in `frontend/src/features/transfer-balance/StorePriorityView.tsx`
-- [ ] T087 [US8] Wire store-priority feature to API via TanStack Query hooks in `frontend/src/features/transfer-balance/hooks/useStorePriority.ts`
+- [X] T084 [US8] Implement region-based and consumption-based priority scoring service in `backend/src/domain/transfer_balance/priority_service.py` (FR-019, FR-021)
+- [X] T085 [US8] Implement `GET /v1/store-priority/profiles` and `POST /v1/store-priority/rules` endpoints in `backend/src/api/routers/store_priority.py` (FR-020)
+- [X] T107 [US8] Implement MAF/Copilot SDK priority-factor explanation agent wrapper (explanation only, not the scoring decision) in `backend/src/agents/store_priority_explainer.py` (per research.md Agent orchestration decision)
+- [X] T086 [P] [US8] Build store priority review view with contributing-factor breakdown in `frontend/src/features/transfer-balance/StorePriorityView.tsx`
+- [X] T087 [US8] Wire store-priority feature to API via TanStack Query hooks in `frontend/src/features/transfer-balance/hooks/useStorePriority.ts`
 
 **Checkpoint**: US1–US5, US7–US8 functional.
 
@@ -250,16 +250,16 @@
 
 ### Tests and Harness for User Story 6 (REQUIRED) ⚠️
 
-- [ ] T088 [P] [US6] Contract test `GET /v1/analytics/kpis` in `backend/tests/contract/test_kpis.py`
-- [ ] T089 [P] [US6] Integration test dashboard filter/aggregation journey in `backend/tests/integration/test_kpi_dashboard.py`
-- [ ] T090 [US6] Harness scenario — happy path (KPI widgets load), failure path (missing data window), data-quality edge case (partial aggregation) in `backend/tests/harness/test_analytics_harness.py`
+- [X] T088 [P] [US6] Contract test `GET /v1/analytics/kpis` in `backend/tests/contract/test_kpis.py`
+- [X] T089 [P] [US6] Integration test dashboard filter/aggregation journey in `backend/tests/integration/test_kpi_dashboard.py`
+- [X] T090 [US6] Harness scenario — happy path (KPI widgets load), failure path (missing data window), data-quality edge case (partial aggregation) in `backend/tests/harness/test_analytics_harness.py`
 
 ### Implementation for User Story 6
 
-- [ ] T091 [US6] Implement `KPIView` model and aggregation service (fill-rate, aging, forecast/replenishment outcomes) in `backend/src/domain/analytics/service.py` (FR-010, FR-011)
-- [ ] T092 [US6] Implement `GET /v1/analytics/kpis` endpoint with region/store/category/time filters in `backend/src/api/routers/analytics.py`
-- [ ] T093 [P] [US6] Build KPI dashboard with high-risk item widgets and trend/exception summaries in `frontend/src/features/analytics/Dashboard.tsx`
-- [ ] T094 [US6] Wire analytics feature to API via TanStack Query hooks in `frontend/src/features/analytics/hooks/useKpis.ts`
+- [X] T091 [US6] Implement `KPIView` model and aggregation service (fill-rate, aging, forecast/replenishment outcomes) in `backend/src/domain/analytics/service.py` (FR-010, FR-011)
+- [X] T092 [US6] Implement `GET /v1/analytics/kpis` endpoint with region/store/category/time filters in `backend/src/api/routers/analytics.py`
+- [X] T093 [P] [US6] Build KPI dashboard with high-risk item widgets and trend/exception summaries in `frontend/src/features/analytics/Dashboard.tsx`
+- [X] T094 [US6] Wire analytics feature to API via TanStack Query hooks in `frontend/src/features/analytics/hooks/useKpis.ts`
 
 **Checkpoint**: All 8 user stories independently functional.
 
@@ -269,17 +269,17 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T095 [P] Implement `GET /v1/admin/audit-log` endpoint in `backend/src/api/routers/admin_audit.py` (FR-014, FR-018)
-- [ ] T096 [P] Documentation updates cross-linking `docs/` to `specs/001-retail-replenishment-v1/`
-- [ ] T097 Code cleanup and refactoring pass across domain modules
-- [ ] T098 Performance validation against SC-001 (60s visibility), SC-003 (2-minute alerting), SC-007 (2-minute triage) targets
-- [ ] T099 [P] Additional backend unit tests for policy/threshold/rate-limit edge logic in `backend/tests/unit/`
-- [ ] T100 [P] Validate dashboard/admin/alert-worklist responsiveness and dark/light mode behavior (Playwright) in `frontend/tests/e2e/theme.spec.ts`
-- [ ] T101 [P] Validate structured logs/metrics/traces and RBAC/audit coverage across all domains
-- [ ] T102 Security hardening pass (RBAC enforcement, input validation, rate-limit abuse testing — OWASP Top 10 review)
-- [ ] T103 Run [quickstart.md](./quickstart.md) validation end-to-end
-- [ ] T104 Validate SC-009 (99.9% uptime design, zone-redundancy configuration) and SC-008 (cost guardrail dashboard against the $15,000/month ceiling and $0.00005/event assumption)
-- [ ] T108 [P] Run a WCAG 2.2 AA accessibility audit (automated axe-core scan in CI + manual review) across alerts, recommendations, approvals, and dashboards in `frontend/tests/e2e/accessibility.spec.ts` (Constitution IV)
+- [X] T095 [P] Implement `GET /v1/admin/audit-log` endpoint in `backend/src/api/routers/admin_audit.py` (FR-014, FR-018)
+- [X] T096 [P] Documentation updates cross-linking `docs/` to `specs/001-retail-replenishment-v1/`
+- [X] T097 Code cleanup and refactoring pass across domain modules
+- [X] T098 Performance validation against SC-001 (60s visibility), SC-003 (2-minute alerting), SC-007 (2-minute triage) targets
+- [X] T099 [P] Additional backend unit tests for policy/threshold/rate-limit edge logic in `backend/tests/unit/`
+- [X] T100 [P] Validate dashboard/admin/alert-worklist responsiveness and dark/light mode behavior (Playwright) in `frontend/tests/e2e/theme.spec.ts`
+- [X] T101 [P] Validate structured logs/metrics/traces and RBAC/audit coverage across all domains
+- [X] T102 Security hardening pass (RBAC enforcement, input validation, rate-limit abuse testing — OWASP Top 10 review)
+- [X] T103 Run [quickstart.md](./quickstart.md) validation end-to-end
+- [X] T104 Validate SC-009 (99.9% uptime design, zone-redundancy configuration) and SC-008 (cost guardrail dashboard against the $15,000/month ceiling and $0.00005/event assumption)
+- [X] T108 [P] Run a WCAG 2.2 AA accessibility audit (automated axe-core scan in CI + manual review) across alerts, recommendations, approvals, and dashboards in `frontend/tests/e2e/accessibility.spec.ts` (Constitution IV)
 
 ---
 

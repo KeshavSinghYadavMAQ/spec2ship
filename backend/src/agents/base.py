@@ -47,7 +47,7 @@ def try_load_maf_agent(*, name: str, instructions: str) -> Any | None:
     """Best-effort import of Microsoft Agent Framework. Returns None if unavailable so
     callers can fall back to deterministic narration instead of failing the request."""
     try:
-        from agent_framework import ChatAgent  # type: ignore[import-not-found]
+        from agent_framework import ChatAgent
     except ImportError:
         logger.info(
             "agent_framework not installed; using deterministic fallback narration",

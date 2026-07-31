@@ -19,9 +19,24 @@ def test_transition_alert_success(client, db_session):
     )
     db_session.commit()
 
-    response = client.post(f"/v1/alerts/{alert.id}/transition", json={"status": "Acknowledged"})
+    response = client.post(
+        f"/v1/alerts/{alert.id}/transition",
+        json={"status": "Acknowledged"},
+        headers={"X-User-Id": "operator-1", "X-User-Role": "store_manager"},
+    )
     assert response.status_code == 200
     assert response.json()["status"] == "Acknowledged"
+
+
+def test_transition_alert_requires_authentication(client, db_session):
+    repo = StockAlertRepository(db_session)
+    alert = repo.create(
+        sku_id="SKU-1B", location_id="STORE-1", severity=Severity.LOW_STOCK, routing_channel="email"
+    )
+    db_session.commit()
+
+    response = client.post(f"/v1/alerts/{alert.id}/transition", json={"status": "Acknowledged"})
+    assert response.status_code == 401
 
 
 def test_transition_alert_invalid_returns_409(client, db_session):
@@ -32,5 +47,9 @@ def test_transition_alert_invalid_returns_409(client, db_session):
     db_session.commit()
 
     # Open -> Resolved is not a valid direct transition.
-    response = client.post(f"/v1/alerts/{alert.id}/transition", json={"status": "Resolved"})
+    response = client.post(
+        f"/v1/alerts/{alert.id}/transition",
+        json={"status": "Resolved"},
+        headers={"X-User-Id": "operator-1", "X-User-Role": "store_manager"},
+    )
     assert response.status_code == 409

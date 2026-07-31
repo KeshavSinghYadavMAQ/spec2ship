@@ -37,10 +37,11 @@ class RedisCacheClient:
 
     def __init__(self, url: str | None = None) -> None:
         settings = get_settings()
-        self._client = redis.Redis.from_url(url or settings.redis_url, decode_responses=True)
+        self._client: redis.Redis = redis.Redis.from_url(url or settings.redis_url, decode_responses=True)
 
     def get(self, key: str) -> str | None:
-        return self._client.get(key)
+        value = self._client.get(key)
+        return value.decode() if isinstance(value, bytes) else value
 
     def set(self, key: str, value: str, ex: int | None = None) -> None:
         self._client.set(key, value, ex=ex)

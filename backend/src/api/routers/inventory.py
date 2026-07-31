@@ -49,8 +49,8 @@ async def list_positions(
 async def ingest_event(
     event_input: IntegrationEventInput,
     session: Session = Depends(get_db_session),
-) -> dict:
-    def _ingest() -> dict:
+) -> dict[str, str]:
+    def _ingest() -> dict[str, str]:
         service = InventoryService(session)
         event = service.ingest_event(event_input)
         cost_guardrails.record_ingested_event()

@@ -34,7 +34,7 @@ class _MafReplenishmentExplainer(ExplanationAgent):
     def explain(self, factors: dict[str, Any]) -> str:
         try:
             # Real MAF integration point: translate `factors` into a ChatAgent.run() call.
-            return self._maf_agent.run(str(factors))
+            return str(self._maf_agent.run(str(factors)))
         except Exception:
             return self._fallback.explain(factors)
 

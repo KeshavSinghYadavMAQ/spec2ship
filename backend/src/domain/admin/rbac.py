@@ -9,7 +9,9 @@ validation without changing the `require_role` call sites.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from enum import StrEnum
+from typing import Any
 
 from fastapi import Depends, HTTPException, Request, status
 from pydantic import BaseModel
@@ -35,7 +37,7 @@ class UserRoleAssignment(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     user_id: Mapped[str] = mapped_column(String(128), index=True)
     role: Mapped[str] = mapped_column(String(32))
-    location_scope: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    location_scope: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
 
 
 class CurrentUser(BaseModel):
@@ -61,7 +63,7 @@ def get_current_user(request: Request) -> CurrentUser:
     return CurrentUser(user_id=user_id, role=role)
 
 
-def require_role(*allowed_roles: Role):
+def require_role(*allowed_roles: Role) -> Callable[..., CurrentUser]:
     """FastAPI dependency factory enforcing that the current user has one of `allowed_roles`."""
 
     def _dependency(current_user: CurrentUser = Depends(get_current_user)) -> CurrentUser:

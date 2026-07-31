@@ -96,8 +96,16 @@ See full pipeline diagram in `.github/agentic-pipeline.md`.
 
 - Active feature pointer: `.specify/feature.json`
 - Current feature spec: `specs/001-retail-replenishment-v1/spec.md`
+- Implementation plan: `specs/001-retail-replenishment-v1/plan.md`
+- Tasks: `specs/001-retail-replenishment-v1/tasks.md`
+- Research decisions: `specs/001-retail-replenishment-v1/research.md`
+- Data model: `specs/001-retail-replenishment-v1/data-model.md`
+- API contracts: `specs/001-retail-replenishment-v1/contracts/openapi.yaml`
+- Quickstart (local setup + test commands): `specs/001-retail-replenishment-v1/quickstart.md`
 - Specification checklist: `specs/001-retail-replenishment-v1/checklists/requirements.md`
 - Agentic flow doc: `.github/agentic-pipeline.md`
+- Phase 11 polish review notes (security, performance, reliability/cost): see
+  [docs/README.md](docs/README.md)
 
 ## Recommended Delivery Commands
 

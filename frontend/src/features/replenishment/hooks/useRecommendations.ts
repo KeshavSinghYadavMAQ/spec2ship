@@ -32,7 +32,7 @@ export interface DecisionInput {
   actionabilityRating?: ActionabilityRating;
 }
 
-export function useDecideRecommendation() {
+export function useDecideRecommendation(actingUserId: string, actingRole: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ recommendationId, decision, overrideReason, actionabilityRating }: DecisionInput) =>
@@ -43,6 +43,7 @@ export function useDecideRecommendation() {
           override_reason: overrideReason,
           actionability_rating: actionabilityRating,
         },
+        { "X-User-Id": actingUserId, "X-User-Role": actingRole },
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["replenishment-recommendations"] });

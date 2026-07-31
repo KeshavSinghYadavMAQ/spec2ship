@@ -23,6 +23,7 @@ import {
   useDecideRecommendation,
   useRecommendations,
 } from "./hooks/useRecommendations";
+import { IdentityBar } from "../../components/IdentityBar";
 
 const useStyles = makeStyles({
   container: { display: "flex", flexDirection: "column", gap: "12px" },
@@ -37,11 +38,20 @@ const useStyles = makeStyles({
  */
 export function RecommendationPanel() {
   const styles = useStyles();
+  const [actingUserId, setActingUserId] = useState("inventory-manager-1");
+  const [actingRole, setActingRole] = useState("inventory_manager");
   const { data, isLoading, isError, error } = useRecommendations();
 
   return (
     <div className={styles.container}>
       <Title2 as="h2">Replenishment Recommendations</Title2>
+
+      <IdentityBar
+        actingUserId={actingUserId}
+        onActingUserIdChange={setActingUserId}
+        actingRole={actingRole}
+        onActingRoleChange={setActingRole}
+      />
 
       {isLoading && <Spinner size="small" label="Loading recommendations..." />}
 
@@ -70,7 +80,12 @@ export function RecommendationPanel() {
           </TableHeader>
           <TableBody>
             {data.map((recommendation) => (
-              <RecommendationRow key={recommendation.id} recommendation={recommendation} />
+              <RecommendationRow
+                key={recommendation.id}
+                recommendation={recommendation}
+                actingUserId={actingUserId}
+                actingRole={actingRole}
+              />
             ))}
           </TableBody>
         </Table>
@@ -79,9 +94,17 @@ export function RecommendationPanel() {
   );
 }
 
-function RecommendationRow({ recommendation }: { recommendation: ReplenishmentRecommendation }) {
+function RecommendationRow({
+  recommendation,
+  actingUserId,
+  actingRole,
+}: {
+  recommendation: ReplenishmentRecommendation;
+  actingUserId: string;
+  actingRole: string;
+}) {
   const styles = useStyles();
-  const decide = useDecideRecommendation();
+  const decide = useDecideRecommendation(actingUserId, actingRole);
   const [rating, setRating] = useState<ActionabilityRating | undefined>(
     recommendation.actionability_rating ?? undefined,
   );

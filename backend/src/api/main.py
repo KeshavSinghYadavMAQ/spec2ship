@@ -12,7 +12,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from src.api.middleware.rate_limit import RateLimitMiddleware
-from src.api.routers import alerts, inventory, replenishment
+from src.api.routers import (
+    admin_audit,
+    admin_policies,
+    alerts,
+    analytics,
+    cost_guardrails,
+    forecasting,
+    inventory,
+    replenishment,
+    store_priority,
+    transfers,
+)
 from src.infrastructure.config import get_settings
 from src.infrastructure.observability import configure_observability
 from src.schemas.errors import ProblemDetail
@@ -57,8 +68,15 @@ v1_router_prefix = "/v1"
 app.include_router(inventory.router, prefix=v1_router_prefix)
 app.include_router(alerts.router, prefix=v1_router_prefix)
 app.include_router(replenishment.router, prefix=v1_router_prefix)
+app.include_router(forecasting.router, prefix=v1_router_prefix)
+app.include_router(transfers.router, prefix=v1_router_prefix)
+app.include_router(admin_policies.router, prefix=v1_router_prefix)
+app.include_router(store_priority.router, prefix=v1_router_prefix)
+app.include_router(analytics.router, prefix=v1_router_prefix)
+app.include_router(admin_audit.router, prefix=v1_router_prefix)
+app.include_router(cost_guardrails.router, prefix=v1_router_prefix)
 
 
 @app.get("/healthz", tags=["ops"])
-async def healthz() -> dict:
+async def healthz() -> dict[str, str]:
     return {"status": "ok"}

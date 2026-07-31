@@ -34,30 +34,50 @@ class ThresholdEvaluationService:
     def evaluate(
         self, position: InventoryPosition, policy: ProductLocationPolicy
     ) -> StockAlert | None:
-        severity = _determine_severity(position, policy)
-        if severity is None:
-            return None
+        """Holds `policy.edit_lock_held` for the duration of evaluation (FR-023) so
+        concurrent admin edits are rejected with 409 and must be re-applied on the next
+        evaluation cycle rather than racing an in-flight evaluation (T077/US7)."""
+        policy.edit_lock_held = True
+        self._session.flush()
+        try:
+            severity = _determine_severity(position, policy)
+            if severity is None:
+                return None
 
-        if should_suppress(
-            self._cache, sku_id=position.sku_id, location_id=position.location_id, severity=severity.value
-        ):
-            return None
+            if should_suppress(
+                self._cache,
+                sku_id=position.sku_id,
+                location_id=position.location_id,
+                severity=severity.value,
+            ):
+                return None
 
-        existing = self._alerts.find_active_for_sku_location(position.sku_id, position.location_id)
-        if existing is not None and existing.severity == severity.value:
-            return None
+            existing = self._alerts.find_active_for_sku_location(
+                position.sku_id, position.location_id
+            )
+            if existing is not None and existing.severity == severity.value:
+                return None
 
-        channel = resolve_channel(severity)
-        alert = self._alerts.create(
-            sku_id=position.sku_id,
-            location_id=position.location_id,
-            severity=severity,
-            routing_channel=channel,
-        )
-        dispatch_notification(
-            sku_id=position.sku_id, location_id=position.location_id, severity=severity, channel=channel
-        )
-        mark_suppressed(
-            self._cache, sku_id=position.sku_id, location_id=position.location_id, severity=severity.value
-        )
-        return alert
+            channel = resolve_channel(severity)
+            alert = self._alerts.create(
+                sku_id=position.sku_id,
+                location_id=position.location_id,
+                severity=severity,
+                routing_channel=channel,
+            )
+            dispatch_notification(
+                sku_id=position.sku_id,
+                location_id=position.location_id,
+                severity=severity,
+                channel=channel,
+            )
+            mark_suppressed(
+                self._cache,
+                sku_id=position.sku_id,
+                location_id=position.location_id,
+                severity=severity.value,
+            )
+            return alert
+        finally:
+            policy.edit_lock_held = False
+            self._session.flush()

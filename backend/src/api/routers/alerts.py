@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
+from src.domain.admin.rbac import CurrentUser, Role, require_role
 from src.domain.alerting.models import (
     AlertStatus,
     InvalidTransitionError,
@@ -44,6 +45,7 @@ async def transition_alert(
     alert_id: str,
     body: TransitionRequest,
     session: Session = Depends(get_db_session),
+    _current_user: CurrentUser = Depends(require_role(*Role)),
 ) -> StockAlertRead:
     def _transition() -> StockAlertRead:
         repo = StockAlertRepository(session)

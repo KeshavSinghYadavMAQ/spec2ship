@@ -9,6 +9,7 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, date, datetime
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel
 from sqlalchemy import JSON, Date, DateTime, Integer, String
@@ -37,8 +38,8 @@ class ReplenishmentRecommendation(Base):
     location_id: Mapped[str] = mapped_column(String(64), index=True)
     recommended_quantity: Mapped[int] = mapped_column(Integer)
     recommended_by_date: Mapped[date] = mapped_column(Date)
-    policy_snapshot: Mapped[dict] = mapped_column(JSON)
-    rationale: Mapped[dict] = mapped_column(JSON)
+    policy_snapshot: Mapped[dict[str, Any]] = mapped_column(JSON)
+    rationale: Mapped[dict[str, Any]] = mapped_column(JSON)
     status: Mapped[str] = mapped_column(String(32), default=RecommendationStatus.PROPOSED)
     override_reason: Mapped[str | None] = mapped_column(String(512), nullable=True)
     actionability_rating: Mapped[str | None] = mapped_column(String(32), nullable=True)
@@ -51,8 +52,8 @@ class ReplenishmentRecommendationRead(BaseModel):
     location_id: str
     recommended_quantity: int
     recommended_by_date: date
-    policy_snapshot: dict
-    rationale: dict
+    policy_snapshot: dict[str, Any]
+    rationale: dict[str, Any]
     status: RecommendationStatus
     override_reason: str | None
     actionability_rating: ActionabilityRating | None
@@ -72,8 +73,8 @@ class ReplenishmentRecommendationRepository:
         location_id: str,
         recommended_quantity: int,
         recommended_by_date: date,
-        policy_snapshot: dict,
-        rationale: dict,
+        policy_snapshot: dict[str, Any],
+        rationale: dict[str, Any],
     ) -> ReplenishmentRecommendation:
         recommendation = ReplenishmentRecommendation(
             id=str(uuid.uuid4()),

@@ -16,38 +16,38 @@ from src.infrastructure.config import get_settings
 
 
 class EventQueueClient(Protocol):
-    def send_event(self, payload: dict) -> None: ...
+    def send_event(self, payload: dict[str, object]) -> None: ...
 
-    def receive_events(self, max_messages: int = 32) -> list[dict]:
+    def receive_events(self, max_messages: int = 32) -> list[dict[str, object]]:
         """Receive and remove up to `max_messages` queued events (at-least-once delivery)."""
         ...
 
-    def dead_letter(self, payload: dict) -> None: ...
+    def dead_letter(self, payload: dict[str, object]) -> None: ...
 
-    def replay_dead_lettered(self, max_messages: int = 32) -> list[dict]: ...
+    def replay_dead_lettered(self, max_messages: int = 32) -> list[dict[str, object]]: ...
 
 
 class InMemoryQueueClient:
     """Local/dev/test substitute for Azure Service Bus. Not for production use."""
 
     def __init__(self) -> None:
-        self._queue: deque[dict] = deque()
-        self._dead_letter: deque[dict] = deque()
+        self._queue: deque[dict[str, object]] = deque()
+        self._dead_letter: deque[dict[str, object]] = deque()
 
-    def send_event(self, payload: dict) -> None:
+    def send_event(self, payload: dict[str, object]) -> None:
         self._queue.append(payload)
 
-    def receive_events(self, max_messages: int = 32) -> list[dict]:
-        received = []
+    def receive_events(self, max_messages: int = 32) -> list[dict[str, object]]:
+        received: list[dict[str, object]] = []
         while self._queue and len(received) < max_messages:
             received.append(self._queue.popleft())
         return received
 
-    def dead_letter(self, payload: dict) -> None:
+    def dead_letter(self, payload: dict[str, object]) -> None:
         self._dead_letter.append(payload)
 
-    def replay_dead_lettered(self, max_messages: int = 32) -> list[dict]:
-        replayed = []
+    def replay_dead_lettered(self, max_messages: int = 32) -> list[dict[str, object]]:
+        replayed: list[dict[str, object]] = []
         while self._dead_letter and len(replayed) < max_messages:
             replayed.append(self._dead_letter.popleft())
         return replayed
@@ -67,13 +67,13 @@ class ServiceBusQueueClient:
         self._settings = settings
         self._client = ServiceBusClient.from_connection_string(settings.service_bus_connection_string)
 
-    def send_event(self, payload: dict) -> None:
+    def send_event(self, payload: dict[str, object]) -> None:
         from azure.servicebus import ServiceBusMessage
 
         with self._client.get_queue_sender(self._settings.service_bus_queue_name) as sender:
             sender.send_messages(ServiceBusMessage(json.dumps(payload)))
 
-    def receive_events(self, max_messages: int = 32) -> list[dict]:
+    def receive_events(self, max_messages: int = 32) -> list[dict[str, object]]:
         with self._client.get_queue_receiver(self._settings.service_bus_queue_name) as receiver:
             messages = receiver.receive_messages(max_message_count=max_messages, max_wait_time=5)
             events = []
@@ -82,12 +82,12 @@ class ServiceBusQueueClient:
                 receiver.complete_message(message)
             return events
 
-    def dead_letter(self, payload: dict) -> None:
+    def dead_letter(self, payload: dict[str, object]) -> None:
         # Production implementation would use the receiver's dead_letter_message on the
         # original message; simplified here to re-publish onto a dead-letter-tagged payload.
         self.send_event({**payload, "_dead_lettered": True})
 
-    def replay_dead_lettered(self, max_messages: int = 32) -> list[dict]:
+    def replay_dead_lettered(self, max_messages: int = 32) -> list[dict[str, object]]:
         events = self.receive_events(max_messages=max_messages)
         return [e for e in events if e.get("_dead_lettered")]
 

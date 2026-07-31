@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Badge,
   Body1,
@@ -13,6 +14,7 @@ import {
   makeStyles,
 } from "@fluentui/react-components";
 
+import { IdentityBar } from "../../components/IdentityBar";
 import { type AlertStatus, useAlerts, useTransitionAlert } from "./hooks/useAlerts";
 
 const useStyles = makeStyles({
@@ -34,12 +36,21 @@ const NEXT_STATUS_ACTIONS: Record<AlertStatus, AlertStatus[]> = {
  */
 export function AlertWorklist() {
   const styles = useStyles();
+  const [actingUserId, setActingUserId] = useState("store-manager-1");
+  const [actingRole, setActingRole] = useState("store_manager");
   const { data, isLoading, isError, error } = useAlerts();
-  const transitionAlert = useTransitionAlert();
+  const transitionAlert = useTransitionAlert(actingUserId, actingRole);
 
   return (
     <div className={styles.container}>
       <Title2 as="h2">Alert Worklist</Title2>
+
+      <IdentityBar
+        actingUserId={actingUserId}
+        onActingUserIdChange={setActingUserId}
+        actingRole={actingRole}
+        onActingRoleChange={setActingRole}
+      />
 
       {isLoading && <Spinner size="small" label="Loading alerts..." />}
 
