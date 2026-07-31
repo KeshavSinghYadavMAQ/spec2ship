@@ -1,7 +1,9 @@
 """Inventory API router (T033, T034, US1).
 
 `GET /v1/inventory/positions` (FR-001) and `POST /v1/inventory/events` (FR-012, FR-022,
-rate-limited per FR-024 via `RateLimitMiddleware`).
+rate-limited per FR-024 via `RateLimitMiddleware`). Ingesting an event also runs threshold
+evaluation (US2, FR-002) so a breach raises a `StockAlert` in the same request rather than
+requiring a separate background sweep.
 """
 
 from __future__ import annotations
@@ -10,9 +12,12 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
+from src.domain.alerting.evaluation_service import ThresholdEvaluationService
+from src.domain.alerting.policy_service import PolicyService
 from src.domain.inventory.integration_event import IntegrationEventInput
 from src.domain.inventory.models import InventoryPositionRead
 from src.domain.inventory.service import InventoryService
+from src.infrastructure.cache import CacheClient, get_cache_client
 from src.infrastructure.cost_guardrails import cost_guardrails
 from src.infrastructure.db import get_db_session
 
@@ -49,11 +54,34 @@ async def list_positions(
 async def ingest_event(
     event_input: IntegrationEventInput,
     session: Session = Depends(get_db_session),
+    cache: CacheClient = Depends(get_cache_client),
 ) -> dict[str, str]:
     def _ingest() -> dict[str, str]:
         service = InventoryService(session)
         event = service.ingest_event(event_input)
         cost_guardrails.record_ingested_event()
+        _evaluate_thresholds(session, cache, event_input)
         return {"id": event.id, "processing_state": event.processing_state}
 
     return await run_in_threadpool(_ingest)
+
+
+def _evaluate_thresholds(
+    session: Session, cache: CacheClient, event_input: IntegrationEventInput
+) -> None:
+    """Run threshold evaluation for the affected sku/location after an event is applied,
+    so a breach raises a `StockAlert` synchronously (US2, FR-002)."""
+    policies = PolicyService(session).list_policies(
+        sku_id=event_input.sku_id, location_id=event_input.location_id
+    )
+    policy = next((p for p in policies if p.is_active), None)
+    if policy is None:
+        return
+
+    positions = InventoryService(session).list_positions(
+        sku_id=event_input.sku_id, location_id=event_input.location_id
+    )
+    if not positions:
+        return
+
+    ThresholdEvaluationService(session, cache).evaluate(positions[0], policy)
