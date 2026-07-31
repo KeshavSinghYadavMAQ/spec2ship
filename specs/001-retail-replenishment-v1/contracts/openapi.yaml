@@ -1,0 +1,394 @@
+openapi: 3.0.3
+info:
+  title: Retail Replenishment V1 API
+  version: "1.0"
+  description: >
+    Backend API contract for the retail inventory replenishment platform (see
+    specs/001-retail-replenishment-v1/spec.md). Grouped by domain; every path maps to
+    functional requirements FR-001 through FR-023.
+servers:
+  - url: /v1
+tags:
+  - name: inventory
+    description: US1 - Real-time stock position (FR-001, FR-012, FR-022)
+  - name: alerting
+    description: US2 - Low/out-of-stock alerting (FR-002, FR-003); US7 - admin thresholds (FR-016 to FR-018, FR-023)
+  - name: replenishment
+    description: US3 - Replenishment recommendations (FR-004, FR-005)
+  - name: forecasting
+    description: US4 - Demand forecasting (FR-006, FR-007)
+  - name: transfer-balance
+    description: US5 - Transfer suggestions (FR-008, FR-009); US8 - store priority (FR-019 to FR-021)
+  - name: analytics
+    description: US6 - Dashboards and KPIs (FR-010, FR-011)
+  - name: admin
+    description: Cross-cutting RBAC and audit (FR-013, FR-014)
+
+paths:
+  /inventory/positions:
+    get:
+      tags: [inventory]
+      summary: List current inventory positions by SKU/location
+      parameters:
+        - { name: sku_id, in: query, schema: { type: string } }
+        - { name: location_id, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: Inventory positions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/InventoryPosition" }
+  /inventory/events:
+    post:
+      tags: [inventory]
+      summary: Ingest a normalized inventory/sales/return event (FR-012, FR-022)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/IntegrationEventInput" }
+      responses:
+        "202":
+          description: Event accepted for processing (queued, applied, or replayed per FR-022)
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProblemDetail" }
+        "429":
+          description: Per-source-system ingestion rate limit exceeded (FR-024); retry after the duration in Retry-After
+          headers:
+            Retry-After:
+              schema: { type: integer }
+              description: Seconds to wait before retrying
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProblemDetail" }
+
+  /alerts:
+    get:
+      tags: [alerting]
+      summary: List stock alerts, filterable by status/severity/location
+      parameters:
+        - { name: status, in: query, schema: { type: string } }
+        - { name: severity, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: Stock alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/StockAlert" }
+  /alerts/{alertId}/transition:
+    post:
+      tags: [alerting]
+      summary: Transition an alert's lifecycle status (Open/Acknowledged/Escalated/Snoozed/Resolved)
+      parameters:
+        - { name: alertId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [Acknowledged, Escalated, Snoozed, Resolved] }
+      responses:
+        "200": { description: Updated alert }
+        "409": { description: Invalid lifecycle transition }
+
+  /admin/product-location-policies:
+    get:
+      tags: [alerting]
+      summary: List product-location threshold and replenishment control policies (US7)
+      responses:
+        "200":
+          description: Policies
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ProductLocationPolicy" }
+    post:
+      tags: [alerting]
+      summary: Create or update a product-location policy (FR-016, FR-017)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductLocationPolicyInput" }
+      responses:
+        "200": { description: Policy saved and activated for subsequent evaluations }
+        "409":
+          description: Rejected because an evaluation is in progress and the edit lock is held (FR-023)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProblemDetail" }
+        "422":
+          description: Invalid or incomplete threshold values (FR-016 Acceptance Scenario 3)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProblemDetail" }
+
+  /replenishment/recommendations:
+    get:
+      tags: [replenishment]
+      summary: List replenishment recommendations with rationale
+      responses:
+        "200":
+          description: Recommendations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ReplenishmentRecommendation" }
+  /replenishment/recommendations/{recommendationId}/decision:
+    post:
+      tags: [replenishment]
+      summary: Accept, override, or dismiss a recommendation (FR-005 explanation preserved regardless of decision)
+      parameters:
+        - { name: recommendationId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [accepted, overridden, dismissed] }
+                override_reason: { type: string }
+      responses:
+        "200": { description: Decision recorded and audited }
+
+  /forecasts:
+    get:
+      tags: [forecasting]
+      summary: List demand forecasts by SKU/store with quality indicators (FR-006, FR-007)
+      parameters:
+        - { name: sku_id, in: query, schema: { type: string } }
+        - { name: location_id, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: Demand forecasts
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/DemandForecast" }
+
+  /transfers/suggestions:
+    get:
+      tags: [transfer-balance]
+      summary: List transfer suggestions, ranked by feasibility and store priority (FR-008, FR-009, FR-020)
+      responses:
+        "200":
+          description: Transfer suggestions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TransferSuggestion" }
+  /transfers/suggestions/{suggestionId}/status:
+    post:
+      tags: [transfer-balance]
+      summary: Update transfer suggestion status (accepted/in_transit/completed/rejected)
+      parameters:
+        - { name: suggestionId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [accepted, in_transit, completed, rejected] }
+      responses:
+        "200": { description: Status updated and audited }
+
+  /store-priority/profiles:
+    get:
+      tags: [transfer-balance]
+      summary: List store restoration priority profiles and contributing factors (US8, FR-019, FR-021)
+      parameters:
+        - { name: region, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: Store priority profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/StorePriorityProfile" }
+  /store-priority/rules:
+    post:
+      tags: [transfer-balance]
+      summary: Update region-based/consumption-based priority weighting rules (FR-019, FR-021)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                region_weight: { type: number }
+                consumption_weight: { type: number }
+      responses:
+        "200": { description: Rules updated; future prioritization recalculations use new weights }
+
+  /analytics/kpis:
+    get:
+      tags: [analytics]
+      summary: Query KPI views with region/store/category/time filters (FR-010, FR-011)
+      parameters:
+        - { name: region, in: query, schema: { type: string } }
+        - { name: store_id, in: query, schema: { type: string } }
+        - { name: category, in: query, schema: { type: string } }
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+      responses:
+        "200":
+          description: KPI values
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/KPIView" }
+
+  /admin/audit-log:
+    get:
+      tags: [admin]
+      summary: Query auditable action history (FR-014, FR-018)
+      parameters:
+        - { name: entity_type, in: query, schema: { type: string } }
+        - { name: entity_id, in: query, schema: { type: string } }
+      responses:
+        "200": { description: Audit log entries }
+
+components:
+  schemas:
+    ProblemDetail:
+      type: object
+      properties:
+        type: { type: string }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field: { type: string }
+              message: { type: string }
+
+    InventoryPosition:
+      type: object
+      properties:
+        sku_id: { type: string }
+        location_id: { type: string }
+        shelf_quantity: { type: integer }
+        backroom_quantity: { type: integer }
+        reconciled_total: { type: integer }
+        freshness_at: { type: string, format: date-time }
+        data_freshness_warning: { type: boolean }
+
+    IntegrationEventInput:
+      type: object
+      required: [source_system, event_type, payload]
+      properties:
+        source_system: { type: string }
+        event_type: { type: string, enum: [stock_update, sale, return] }
+        payload: { type: object }
+
+    StockAlert:
+      type: object
+      properties:
+        id: { type: string }
+        sku_id: { type: string }
+        location_id: { type: string }
+        severity: { type: string, enum: [low_stock, out_of_stock] }
+        status: { type: string, enum: [Open, Acknowledged, Escalated, Snoozed, Resolved] }
+        owner_user_id: { type: string, nullable: true }
+
+    ProductLocationPolicy:
+      type: object
+      properties:
+        sku_id: { type: string }
+        location_id: { type: string }
+        low_stock_threshold: { type: integer }
+        out_of_stock_threshold: { type: integer }
+        reorder_point: { type: integer }
+        min_qty: { type: integer }
+        max_qty: { type: integer }
+        safety_stock: { type: integer }
+        is_active: { type: boolean }
+        edit_lock_held: { type: boolean }
+
+    ProductLocationPolicyInput:
+      type: object
+      required: [sku_id, location_id, low_stock_threshold, out_of_stock_threshold]
+      properties:
+        sku_id: { type: string }
+        location_id: { type: string }
+        low_stock_threshold: { type: integer }
+        out_of_stock_threshold: { type: integer }
+        reorder_point: { type: integer }
+        min_qty: { type: integer }
+        max_qty: { type: integer }
+        safety_stock: { type: integer }
+
+    ReplenishmentRecommendation:
+      type: object
+      properties:
+        id: { type: string }
+        sku_id: { type: string }
+        location_id: { type: string }
+        recommended_quantity: { type: integer }
+        recommended_by_date: { type: string, format: date }
+        rationale: { type: object }
+        status: { type: string, enum: [proposed, accepted, overridden, dismissed] }
+
+    DemandForecast:
+      type: object
+      properties:
+        sku_id: { type: string }
+        location_id: { type: string }
+        horizon_start: { type: string, format: date }
+        horizon_end: { type: string, format: date }
+        projected_demand: { type: number }
+        error_indicator: { type: number }
+
+    TransferSuggestion:
+      type: object
+      properties:
+        id: { type: string }
+        sku_id: { type: string }
+        source_location_id: { type: string }
+        destination_location_id: { type: string }
+        suggested_quantity: { type: integer }
+        feasibility_status: { type: string, enum: [feasible, infeasible] }
+        priority_rank: { type: integer, nullable: true }
+        status: { type: string, enum: [suggested, accepted, in_transit, completed, rejected] }
+
+    StorePriorityProfile:
+      type: object
+      properties:
+        store_id: { type: string }
+        region: { type: string }
+        recent_consumption_rate: { type: number }
+        current_priority_rank: { type: integer }
+        priority_factors: { type: object }
+
+    KPIView:
+      type: object
+      properties:
+        metric_key: { type: string }
+        dimension: { type: object }
+        value: { type: number }
+        computed_at: { type: string, format: date-time }

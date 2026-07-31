@@ -17,6 +17,21 @@
 - **Operational Readiness**: Scope includes role-aware actionability, auditable recommendation rationale, and operations-grade monitoring expectations.
 - **Azure Architecture and Cost**: V1 planning includes Azure Well-Architected alignment and explicit cost guardrails for pilot deployment.
 
+## Clarifications
+
+### Session 2026-07-31
+
+- Q: What is the expected v1 pilot scale (stores × SKUs) the platform must support? → A: Enterprise scale: 1,000+ stores, 100,000+ SKUs
+- Q: How should the system handle upstream source-system unavailability or delayed inventory/sales/returns feeds? → A: Queue and replay: buffer inbound events and reconcile automatically once the source recovers, flagging a data-freshness warning in the meantime
+- Q: When an admin updates a product-location threshold while an alert/replenishment evaluation is already in progress, which behavior should apply? → A: Lock during edit: threshold edits are blocked while an evaluation is in progress, then applied once it completes
+- Q: What lifecycle states should a StockAlert progress through after it is generated? → A: Five states: Open, Acknowledged, Escalated, Snoozed, Resolved
+- Q: What is the v1 language/localization scope for user-facing screens? → A: Single language (English) for v1; UI text externalized for future localization
+
+### Session 2026-08-01
+
+- Q: What reliability/availability target must the platform meet for v1? → A: 99.9% monthly uptime (~43 min/month downtime budget), single-region managed PaaS, standard recovery objectives
+- Q: How should inbound event ingestion handle a source system sending events faster than the system can safely process? → A: Per-source-system rate limit with HTTP 429 + Retry-After; excess events rejected for the client to retry (no server-side buffering beyond the FR-022 outage queue)
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - View Real-Time Stock Position (Priority: P1)
@@ -151,10 +166,11 @@ As a regional inventory planner, I can prioritize stores for item restoration ba
 - Shelf stock is zero while backroom stock is available for the same SKU.
 - Promotion-driven demand spike causes simultaneous low stock events across many stores.
 - Lead time changes abruptly after a recommendation is generated.
-- A store syncs delayed transactions after temporary offline operation.
+- A store syncs delayed transactions after temporary offline operation; inbound events are queued and replayed automatically once the source reconnects, without manual intervention.
 - Returns temporarily inflate stock after out-of-stock state transitions.
-- An admin changes thresholds for a product-location while alert evaluation is already in progress.
+- An admin changes thresholds for a product-location while alert evaluation is already in progress; the edit is blocked until the in-flight evaluation completes, then applied starting with the next evaluation cycle.
 - Two stores in different regions have conflicting priority signals, such as higher regional importance but lower recent consumption.
+- A source system exceeds its allotted ingestion rate; excess events are rejected with a retryable error rather than queued or dropped silently.
 
 ## Requirements *(mandatory)*
 
@@ -181,11 +197,14 @@ As a regional inventory planner, I can prioritize stores for item restoration ba
 - **FR-019**: System MUST calculate store restoration priority using configurable region-based and consumption-based factors.
 - **FR-020**: System MUST apply store priority rankings to restoration, replenishment, and transfer decision flows when inventory is constrained.
 - **FR-021**: System MUST allow authorized users to review the factors contributing to a store's current restoration priority.
+- **FR-022**: System MUST queue inbound inventory, sales, and returns events during upstream source unavailability and automatically replay and reconcile them once the source recovers, surfacing a data-freshness warning to users in the interim.
+- **FR-023**: System MUST block product-location threshold edits while an evaluation cycle for that product-location is in progress, and apply the accepted edit starting with the next evaluation cycle.
+- **FR-024**: System MUST enforce a per-source-system ingestion rate limit and reject events exceeding that limit with a retryable error (HTTP 429 and retry guidance) rather than buffering them, independent of the FR-022 outage queue-and-replay path.
 
 ### Key Entities *(include if feature involves data)*
 
 - **InventoryPosition**: Current and projected quantity state for SKU-location with shelf/backroom split and freshness metadata.
-- **StockAlert**: Alert record for low stock or out-of-stock conditions with severity, status, owner, and routing metadata.
+- **StockAlert**: Alert record for low stock or out-of-stock conditions with severity, lifecycle status (Open, Acknowledged, Escalated, Snoozed, Resolved), owner, and routing metadata.
 - **ReplenishmentRecommendation**: Reorder recommendation with quantity, timing, constraints, and explanation factors.
 - **DemandForecast**: Future demand projection by SKU and store with horizon and quality indicators.
 - **TransferSuggestion**: Proposed transfer action between source and destination with quantity, feasibility checks, and expected impact.
@@ -207,6 +226,7 @@ As a regional inventory planner, I can prioritize stores for item restoration ba
 - **SC-006**: At least 25% of shortage cases in pilot regions are mitigated through transfer suggestions.
 - **SC-007**: Users complete critical dashboard triage workflows in under 2 minutes for at least 90% of observed sessions.
 - **SC-008**: Monthly pilot operating cost remains within predefined budget guardrails while meeting service-level goals.
+- **SC-009**: Platform maintains at least 99.9% monthly uptime for core inventory, alerting, and replenishment workflows, measured against a single-region managed-service deployment.
 
 ## Assumptions
 
@@ -218,3 +238,5 @@ As a regional inventory planner, I can prioritize stores for item restoration ba
 - Pilot rollout starts with selected stores and SKU categories before broader rollout.
 - Alert channels are available and can be configured by environment.
 - Operational audit retention requirements permit storage of recommendation and action history.
+- V1 architecture must support enterprise-scale volume (1,000+ stores and 100,000+ SKUs), informing data throughput, storage, and Azure sizing decisions even though initial pilot rollout targets a smaller subset of stores and categories.
+- V1 ships with a single language (English) user interface; UI text is externalized to support future localization without rework.
