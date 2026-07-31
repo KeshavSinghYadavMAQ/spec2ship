@@ -84,7 +84,7 @@
 
 - [X] T032 [US1] Implement inventory reconciliation service (shelf+backroom totals, dedupe/out-of-order handling) in `backend/src/domain/inventory/service.py` (FR-001)
 - [X] T033 [US1] Implement `GET /v1/inventory/positions` endpoint in `backend/src/api/routers/inventory.py`
-- [X] T034 [US1] Implement `POST /v1/inventory/events` endpoint wired to Service Bus queue + rate-limit middleware in `backend/src/api/routers/inventory.py` (FR-012, FR-024)
+- [X] T034 [US1] Implement `POST /v1/inventory/events` endpoint wired to Service Bus queue + rate-limit middleware in `backend/src/api/routers/inventory.py` (FR-012, FR-024); also invokes `ThresholdEvaluationService` for the affected sku/location after ingest so a breach raises a `StockAlert` synchronously (FR-002, fixed post-implementation review 2026-08-01 — previously only exercised by tests, not wired into the router)
 - [X] T035 [US1] Implement replay/reconciliation worker with data-freshness warning flag in `backend/src/domain/inventory/replay_worker.py` (FR-022)
 - [X] T036 [P] [US1] Build inventory position table/detail view (shelf/backroom/reconciled total, freshness indicator) in `frontend/src/features/inventory/InventoryPositionView.tsx`
 - [X] T037 [US1] Wire inventory feature to API via TanStack Query hooks in `frontend/src/features/inventory/hooks/useInventoryPositions.ts`

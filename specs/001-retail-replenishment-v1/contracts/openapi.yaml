@@ -43,7 +43,7 @@ paths:
   /inventory/events:
     post:
       tags: [inventory]
-      summary: Ingest a normalized inventory/sales/return event (FR-012, FR-022)
+      summary: Ingest a normalized inventory/sales/return event (FR-012, FR-022); also runs threshold evaluation for the affected sku/location, raising a StockAlert on breach (FR-002)
       requestBody:
         required: true
         content:
