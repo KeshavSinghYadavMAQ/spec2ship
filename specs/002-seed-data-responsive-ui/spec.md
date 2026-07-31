@@ -99,7 +99,7 @@ As a user who prefers dark mode (e.g., in low-light environments) or light mode,
 - If a to-be-seeded identifier collides with a pre-existing, genuine (non-seed) record, seeding fails fast for that record (or the run) with a surfaced error, rather than overwriting or silently skipping the real data.
 - If seeding is interrupted partway through, re-running the seeding action resolves it by completing only the missing records (resumable/idempotent), without requiring manual cleanup or automatic rollback.
 - The minimum supported mobile viewport width is 360px; data-dense screens such as the analytics dashboard remain usable at that width (e.g., via scrollable table/chart containers or stacked layouts) without breaking the overall page layout.
-- How are colorful status/severity indicators (e.g., alert severity, priority rank) distinguished for colorblind users beyond color alone?
+- Colorful status/severity indicators (e.g., alert severity, priority rank) are distinguished for colorblind users through non-color cues such as icons, text labels, or patterns, not color alone (see FR-010).
 - What happens when a user has an OS-level "reduced motion" or "high contrast" accessibility preference active alongside their theme selection?
 
 ## Requirements *(mandatory)*
@@ -113,7 +113,7 @@ As a user who prefers dark mode (e.g., in low-light environments) or light mode,
 - **FR-005**: The seeded sample dataset MUST reach pilot scale consistent with the v1 platform's target scale (1,000+ stores, 100,000+ distinct SKUs across the catalog, per spec 001), with each store carrying a realistic per-store assortment rather than a full store-by-SKU cross-product, so total record volume stays operationally reasonable while still exercising performance and UX at scale.
 - **FR-006**: The application UI MUST apply a consistent, modern, colorful visual design system (shared color palette, typography, spacing, iconography) across all existing feature screens (inventory, alerting, replenishment, forecasting, transfers, analytics, admin).
 - **FR-007**: The UI MUST remain fully responsive, with no cut-off content, overlapping elements, or required horizontal scrolling for primary workflows, across common desktop, tablet, and mobile breakpoints down to a minimum supported mobile viewport width of 360px.
-- **FR-008**: The UI MUST preserve visual clarity and adequate color contrast for all colorful elements (status badges, charts, alerts) in both dark and light themes.
+- **FR-008**: The UI MUST preserve visual clarity and adequate color contrast for all colorful elements (status badges, charts, alerts) in both dark and light themes, meeting at least WCAG 2.2 AA contrast standards.
 - **FR-009**: Users MUST be able to toggle between dark and light themes, and their preference MUST persist across sessions.
 - **FR-010**: Status and severity indicators MUST remain distinguishable to colorblind users through means beyond color alone (e.g., icons, text labels, or patterns).
 - **FR-011**: System MUST provide an explicit action to remove all previously seeded sample data, independent of a full database reset, gated by the same `admin` role and non-production environment safeguard required for seeding (FR-004), and MUST leave any genuine non-seed data untouched.
@@ -131,7 +131,7 @@ As a user who prefers dark mode (e.g., in low-light environments) or light mode,
 - **SC-001**: A new stakeholder can view a fully populated, pilot-scale demo environment, showing realistic multi-store data across every existing dashboard, from a single seeding action completing in under 30 minutes, without any manual data entry.
 - **SC-002**: 100% of the application's primary screens display populated, realistic-looking records immediately after seeding, with no empty states in a seeded environment.
 - **SC-003**: All primary workflows remain fully usable, with no horizontal scrolling or obscured content, at common desktop, tablet, and mobile breakpoints down to a minimum supported mobile viewport width of 360px.
-- **SC-004**: All in-scope screens meet at least WCAG AA color contrast standards in both dark and light themes.
+- **SC-004**: All in-scope screens meet at least WCAG 2.2 AA color contrast standards in both dark and light themes.
 - **SC-005**: Users can switch themes in a single action, and the preference is automatically applied on their next visit 100% of the time.
 - **SC-006**: The full pilot-scale sample dataset can be regenerated from a single action, completing in under 30 minutes, without requiring engineering support.
 - **SC-007**: In a usability review, at least 90% of operational users rate the interface's visual consistency and modern appearance as satisfactory.
