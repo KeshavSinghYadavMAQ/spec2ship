@@ -28,15 +28,11 @@ export function useAlerts(filters: { status?: string; severity?: string } = {}) 
   });
 }
 
-export function useTransitionAlert(actingUserId: string, actingRole: string) {
+export function useTransitionAlert(_actingUserId: string, _actingRole: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ alertId, status }: { alertId: string; status: AlertStatus }) =>
-      apiClient.post<StockAlert>(
-        `/alerts/${alertId}/transition`,
-        { status },
-        { "X-User-Id": actingUserId, "X-User-Role": actingRole },
-      ),
+      apiClient.post<StockAlert>(`/alerts/${alertId}/transition`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["alerts"] });
     },

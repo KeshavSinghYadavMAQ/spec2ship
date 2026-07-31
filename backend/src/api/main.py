@@ -12,11 +12,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from src.api.middleware.rate_limit import RateLimitMiddleware
+from src.api.middleware.session_context import SessionContextMiddleware
 from src.api.routers import (
     admin_audit,
     admin_policies,
+    admin_sample_data,
     alerts,
     analytics,
+    auth,
     cost_guardrails,
     forecasting,
     inventory,
@@ -42,6 +45,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(RateLimitMiddleware)
+app.add_middleware(SessionContextMiddleware)
 
 
 @app.exception_handler(RequestValidationError)
@@ -66,6 +70,7 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 
 v1_router_prefix = "/v1"
 app.include_router(inventory.router, prefix=v1_router_prefix)
+app.include_router(auth.router, prefix=v1_router_prefix)
 app.include_router(alerts.router, prefix=v1_router_prefix)
 app.include_router(replenishment.router, prefix=v1_router_prefix)
 app.include_router(forecasting.router, prefix=v1_router_prefix)
@@ -75,6 +80,7 @@ app.include_router(store_priority.router, prefix=v1_router_prefix)
 app.include_router(analytics.router, prefix=v1_router_prefix)
 app.include_router(admin_audit.router, prefix=v1_router_prefix)
 app.include_router(cost_guardrails.router, prefix=v1_router_prefix)
+app.include_router(admin_sample_data.router, prefix=v1_router_prefix)
 
 
 @app.get("/healthz", tags=["ops"])

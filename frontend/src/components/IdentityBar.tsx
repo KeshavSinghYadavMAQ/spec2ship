@@ -1,4 +1,4 @@
-import { Body1, Dropdown, Input, Option, makeStyles } from "@fluentui/react-components";
+import { Body1, Dropdown, Input, Option, makeStyles, tokens } from "@fluentui/react-components";
 
 export const ROLE_OPTIONS = [
   "admin",
@@ -9,7 +9,12 @@ export const ROLE_OPTIONS = [
 ] as const;
 
 const useStyles = makeStyles({
-  identityBar: { display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" },
+  identityBar: {
+    display: "flex",
+    gap: tokens.spacingHorizontalS,
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
 });
 
 interface IdentityBarProps {

@@ -100,9 +100,19 @@ class TransferSuggestionRepository:
     def get(self, suggestion_id: str) -> TransferSuggestion | None:
         return self._session.get(TransferSuggestion, suggestion_id)
 
-    def list(self) -> list[TransferSuggestion]:
-        return (
-            self._session.query(TransferSuggestion)
-            .order_by(TransferSuggestion.priority_rank.desc(), TransferSuggestion.created_at.desc())
-            .all()
-        )
+    def list(
+        self,
+        scoped_location_ids: set[str] | None = None,
+        all_locations: bool = True,
+    ) -> list[TransferSuggestion]:
+        query = self._session.query(TransferSuggestion)
+        if not all_locations:
+            scoped_location_ids = scoped_location_ids or set()
+            if scoped_location_ids:
+                query = query.filter(
+                    TransferSuggestion.source_location_id.in_(scoped_location_ids)
+                    | TransferSuggestion.destination_location_id.in_(scoped_location_ids)
+                )
+            else:
+                return []
+        return query.order_by(TransferSuggestion.priority_rank.desc(), TransferSuggestion.created_at.desc()).all()

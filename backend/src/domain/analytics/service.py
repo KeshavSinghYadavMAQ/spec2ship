@@ -72,8 +72,16 @@ class KPIAggregationService:
         category: str | None = None,
         date_from: date | None = None,
         date_to: date | None = None,
+        scoped_store_ids: set[str] | None = None,
+        all_locations: bool = True,
     ) -> KPIView:
         store_ids = self._resolve_store_ids(region=region, store_id=store_id)
+        if not all_locations:
+            allowed = scoped_store_ids or set()
+            if store_ids is None:
+                store_ids = sorted(allowed)
+            else:
+                store_ids = [store for store in store_ids if store in allowed]
 
         position_query = self._session.query(InventoryPosition)
         if store_ids is not None:

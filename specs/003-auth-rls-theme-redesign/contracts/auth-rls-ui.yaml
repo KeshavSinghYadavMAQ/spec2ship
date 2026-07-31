@@ -1,0 +1,348 @@
+openapi: 3.0.3
+info:
+  title: Auth + RLS API Contract (Feature 003)
+  version: "1.0"
+  description: >
+    Incremental contract for authentication/session management and row-level security
+    behavior for specs/003-auth-rls-theme-redesign/spec.md. Extends the existing V1 API
+    contract in specs/001-retail-replenishment-v1/contracts/openapi.yaml.
+servers:
+  - url: /v1
+tags:
+  - name: auth
+    description: Session-based authentication (US1, FR-001 to FR-007)
+  - name: rls
+    description: Cross-domain row-level security behavior (US2, FR-008 to FR-013a)
+
+paths:
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Authenticate a user and create a server-side session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authenticated; session cookie is set
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: HttpOnly secure session cookie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials or invalid session state (generic message)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "423":
+          description: Account temporarily locked due to failed attempts policy
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: Invalidate the current session
+      responses:
+        "200":
+          description: Session invalidated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogoutResponse"
+        "401":
+          description: No valid session
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /auth/session:
+    get:
+      tags: [auth]
+      summary: Get current authenticated session summary
+      responses:
+        "200":
+          description: Active session details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionSummary"
+        "401":
+          description: Missing/expired/revoked session
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /inventory/positions:
+    get:
+      tags: [rls]
+      summary: List inventory positions filtered to caller scope
+      parameters:
+        - { name: sku_id, in: query, schema: { type: string } }
+        - { name: location_id, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: In-scope inventory positions only (out-of-scope rows filtered)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InventoryPosition"
+        "401":
+          description: No valid session
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /inventory/positions/{positionId}:
+    get:
+      tags: [rls]
+      summary: Fetch single inventory position if in scope
+      parameters:
+        - { name: positionId, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Requested inventory position in caller scope
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryPosition"
+        "404":
+          description: Record not found or not in caller scope (indistinguishable)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: No valid session
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /alerts:
+    get:
+      tags: [rls]
+      summary: List alerts filtered to caller scope
+      responses:
+        "200":
+          description: In-scope alert rows only; response shape matches base V1 alert contract
+        "401":
+          description: No valid session
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /replenishment/recommendations:
+    get:
+      tags: [rls]
+      summary: List replenishment recommendations filtered to caller scope
+      responses:
+        "200":
+          description: In-scope recommendation rows only; response shape matches base V1 replenishment contract
+        "401":
+          description: No valid session
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /forecasts:
+    get:
+      tags: [rls]
+      summary: List demand forecasts filtered to caller scope
+      responses:
+        "200":
+          description: In-scope forecast rows only; response shape matches base V1 forecasting contract
+        "401":
+          description: No valid session
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /transfers/suggestions:
+    get:
+      tags: [rls]
+      summary: List transfer suggestions filtered to caller scope
+      responses:
+        "200":
+          description: In-scope transfer suggestion rows only; response shape matches base V1 transfer contract
+        "401":
+          description: No valid session
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /store-priority/profiles:
+    get:
+      tags: [rls]
+      summary: List store-priority profiles filtered to caller scope
+      responses:
+        "200":
+          description: In-scope store-priority rows only; response shape matches base V1 store-priority contract
+        "401":
+          description: No valid session
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /alerts/{alertId}/transition:
+    post:
+      tags: [rls]
+      summary: Transition an alert only when the alert record is in caller scope
+      parameters:
+        - { name: alertId, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Transition applied for an in-scope alert record
+        "404":
+          description: Alert record not found or not in caller scope (indistinguishable)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: No valid session
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /replenishment/recommendations/{recommendationId}/decision:
+    post:
+      tags: [rls]
+      summary: Review decision allowed only when recommendation record is in caller scope
+      parameters:
+        - { name: recommendationId, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Decision applied for an in-scope recommendation record
+        "404":
+          description: Recommendation record not found or not in caller scope (indistinguishable)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: No valid session
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /transfers/suggestions/{suggestionId}/status:
+    post:
+      tags: [rls]
+      summary: Status update allowed only when transfer suggestion record is in caller scope
+      parameters:
+        - { name: suggestionId, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Status update applied for an in-scope transfer suggestion record
+        "404":
+          description: Transfer suggestion record not found or not in caller scope (indistinguishable)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: No valid session
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required: [identifier, password]
+      properties:
+        identifier:
+          type: string
+        password:
+          type: string
+          format: password
+
+    LoginResponse:
+      type: object
+      required: [user_id, role, scope]
+      properties:
+        user_id:
+          type: string
+        role:
+          type: string
+          enum: [store_manager, inventory_manager, procurement_officer, regional_manager, admin]
+        scope:
+          type: object
+          additionalProperties: true
+
+    SessionSummary:
+      type: object
+      required: [user_id, role, scope, expires_at]
+      properties:
+        user_id:
+          type: string
+        role:
+          type: string
+        scope:
+          type: object
+          additionalProperties: true
+        expires_at:
+          type: string
+          format: date-time
+
+    LogoutResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [logged_out]
+
+    InventoryPosition:
+      type: object
+      required: [id, sku_id, location_id, shelf_quantity, backroom_quantity, reconciled_total]
+      properties:
+        id: { type: string }
+        sku_id: { type: string }
+        location_id: { type: string }
+        shelf_quantity: { type: integer }
+        backroom_quantity: { type: integer }
+        reconciled_total: { type: integer }
+        freshness_at: { type: string, format: date-time }
+        data_freshness_warning: { type: boolean }
+
+    ProblemDetail:
+      type: object
+      required: [title, status, detail]
+      properties:
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string, nullable: true }
+        errors:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: array
+            items: { type: string }

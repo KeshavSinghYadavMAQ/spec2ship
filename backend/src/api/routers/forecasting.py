@@ -11,7 +11,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
+from src.domain.admin.rbac import CurrentUser, Role, require_role
 from src.domain.forecasting.models import DemandForecastRead, DemandForecastRepository
+from src.domain.security.scope_service import ScopeResolutionService
 from src.infrastructure.db import get_db_session
 
 router = APIRouter(prefix="/forecasts", tags=["forecasting"])
@@ -22,12 +24,19 @@ async def list_forecasts(
     sku_id: str | None = None,
     location_id: str | None = None,
     session: Session = Depends(get_db_session),
+    current_user: CurrentUser = Depends(require_role(*Role)),
 ) -> list[DemandForecastRead]:
     def _query() -> list[DemandForecastRead]:
+        scope = ScopeResolutionService(session).resolve_for_user(current_user.user_id)
         repo = DemandForecastRepository(session)
         return [
             DemandForecastRead.model_validate(f)
-            for f in repo.list(sku_id=sku_id, location_id=location_id)
+            for f in repo.list(
+                sku_id=sku_id,
+                location_id=location_id,
+                scoped_location_ids=set(scope.location_ids),
+                all_locations=scope.all_locations,
+            )
         ]
 
     return await run_in_threadpool(_query)

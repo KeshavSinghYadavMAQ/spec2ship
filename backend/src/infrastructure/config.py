@@ -30,6 +30,12 @@ class Settings(BaseSettings):
     # CORS - frontend dev origin
     cors_allow_origins: list[str] = ["http://localhost:5173"]
 
+    # Auth/session cookie settings
+    auth_session_cookie_name: str = "rr_session"
+    auth_session_cookie_secure: bool = False
+    auth_session_cookie_samesite: str = "lax"
+    auth_session_cookie_path: str = "/"
+
     # Rate limiting (FR-024)
     rate_limit_requests_per_window: int = 100
     rate_limit_window_seconds: int = 60

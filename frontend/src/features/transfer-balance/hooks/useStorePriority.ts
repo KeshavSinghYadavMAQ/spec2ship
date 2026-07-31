@@ -21,14 +21,11 @@ export function useStorePriorityProfiles(region?: string) {
   });
 }
 
-export function useUpdatePriorityRules(actingUserId: string, actingRole: string) {
+export function useUpdatePriorityRules(_actingUserId: string, _actingRole: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (rules: { region_weight?: number; consumption_weight?: number }) =>
-      apiClient.post<StorePriorityProfile[]>("/store-priority/rules", rules, {
-        "X-User-Id": actingUserId,
-        "X-User-Role": actingRole,
-      }),
+      apiClient.post<StorePriorityProfile[]>("/store-priority/rules", rules),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["store-priority-profiles"] });
     },

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Badge,
   Body1,
   Button,
   Spinner,
@@ -12,9 +11,14 @@ import {
   TableRow,
   Title2,
   makeStyles,
+  tokens,
 } from "@fluentui/react-components";
 
+import { StatusBadge } from "../../components/StatusBadge";
+import { ScrollableTableContainer } from "../../components/ScrollableTableContainer";
+import { KpiCard } from "../../components/KpiCard";
 import { IdentityBar } from "../../components/IdentityBar";
+import { useTransferKpis } from "./hooks/useTransferKpis";
 import {
   type TransferStatus,
   type TransferSuggestion,
@@ -23,8 +27,9 @@ import {
 } from "./hooks/useTransfers";
 
 const useStyles = makeStyles({
-  container: { display: "flex", flexDirection: "column", gap: "12px" },
-  actions: { display: "flex", gap: "8px", flexWrap: "wrap" },
+  container: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM },
+  actions: { display: "flex", gap: tokens.spacingHorizontalS, flexWrap: "wrap" },
+  kpiRow: { display: "flex", gap: tokens.spacingHorizontalM, flexWrap: "wrap" },
 });
 
 const nextActions: Partial<Record<TransferStatus, { label: string; target: TransferStatus }[]>> = {
@@ -46,6 +51,7 @@ export function TransferSuggestions() {
   const [actingUserId, setActingUserId] = useState("regional-manager-1");
   const [actingRole, setActingRole] = useState("regional_manager");
   const { data, isLoading, isError, error } = useTransferSuggestions();
+  const kpis = useTransferKpis(data);
   const updateStatus = useUpdateTransferStatus(actingUserId, actingRole);
 
   return (
@@ -72,6 +78,13 @@ export function TransferSuggestions() {
       )}
 
       {!isLoading && !isError && data && data.length > 0 && (
+        <>
+        <div className={styles.kpiRow}>
+          {kpis.map((kpi) => (
+            <KpiCard key={kpi.key} label={kpi.label} value={kpi.value} />
+          ))}
+        </div>
+        <ScrollableTableContainer>
         <Table aria-label="Transfer suggestions">
           <TableHeader>
             <TableRow>
@@ -94,9 +107,10 @@ export function TransferSuggestions() {
                 <TableCell>{suggestion.suggested_quantity}</TableCell>
                 <TableCell>{suggestion.priority_rank}</TableCell>
                 <TableCell>
-                  <Badge color={suggestion.feasibility_status === "feasible" ? "success" : "danger"}>
-                    {suggestion.feasibility_status}
-                  </Badge>
+                  <StatusBadge
+                    tone={suggestion.feasibility_status === "feasible" ? "success" : "danger"}
+                    label={suggestion.feasibility_status.replace(/_/g, " ")}
+                  />
                   <Body1>{suggestion.feasibility_reason}</Body1>
                 </TableCell>
                 <TableCell>{suggestion.status}</TableCell>
@@ -120,6 +134,8 @@ export function TransferSuggestions() {
             ))}
           </TableBody>
         </Table>
+        </ScrollableTableContainer>
+        </>
       )}
     </div>
   );

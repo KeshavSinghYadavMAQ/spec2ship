@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
 from src.domain.admin.rbac import CurrentUser, Role, require_role
+from src.domain.security.scope_service import ScopeResolutionService
 from src.domain.transfer_balance.priority_models import StorePriorityProfileRead
 from src.domain.transfer_balance.priority_service import StorePriorityService
 from src.infrastructure.db import get_db_session
@@ -28,11 +29,18 @@ class PriorityRulesRequest(BaseModel):
 async def list_store_priority_profiles(
     region: str | None = None,
     session: Session = Depends(get_db_session),
+    current_user: CurrentUser = Depends(require_role(*Role)),
 ) -> list[StorePriorityProfileRead]:
     def _query() -> list[StorePriorityProfileRead]:
+        scope = ScopeResolutionService(session).resolve_for_user(current_user.user_id)
         service = StorePriorityService(session)
         return [
-            StorePriorityProfileRead.model_validate(p) for p in service.list_profiles(region=region)
+            StorePriorityProfileRead.model_validate(p)
+            for p in service.list_profiles(
+                region=region,
+                scoped_store_ids=set(scope.location_ids),
+                all_locations=scope.all_locations,
+            )
         ]
 
     return await run_in_threadpool(_query)

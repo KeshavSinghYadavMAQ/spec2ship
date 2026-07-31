@@ -24,9 +24,18 @@ class InventoryService:
         self._event_service = IntegrationEventService(session)
 
     def list_positions(
-        self, sku_id: str | None = None, location_id: str | None = None
+        self,
+        sku_id: str | None = None,
+        location_id: str | None = None,
+        scoped_location_ids: set[str] | None = None,
+        all_locations: bool = True,
     ) -> list[InventoryPosition]:
-        return self._repo.list(sku_id=sku_id, location_id=location_id)
+        return self._repo.list(
+            sku_id=sku_id,
+            location_id=location_id,
+            scoped_location_ids=scoped_location_ids,
+            all_locations=all_locations,
+        )
 
     def ingest_event(
         self, event_input: IntegrationEventInput, *, source_unavailable: bool = False

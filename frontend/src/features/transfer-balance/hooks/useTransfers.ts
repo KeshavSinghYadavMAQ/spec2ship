@@ -25,15 +25,11 @@ export function useTransferSuggestions() {
   });
 }
 
-export function useUpdateTransferStatus(actingUserId: string, actingRole: string) {
+export function useUpdateTransferStatus(_actingUserId: string, _actingRole: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ suggestionId, status }: { suggestionId: string; status: TransferStatus }) =>
-      apiClient.post<TransferSuggestion>(
-        `/transfers/suggestions/${suggestionId}/status`,
-        { status },
-        { "X-User-Id": actingUserId, "X-User-Role": actingRole },
-      ),
+      apiClient.post<TransferSuggestion>(`/transfers/suggestions/${suggestionId}/status`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transfer-suggestions"] });
     },

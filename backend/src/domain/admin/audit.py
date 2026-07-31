@@ -82,3 +82,34 @@ class AuditLogWriter:
         if entity_id:
             query = query.filter_by(entity_id=entity_id)
         return query.order_by(AuditLogEntry.created_at.desc()).all()
+
+    def record_auth_event(
+        self,
+        *,
+        event_type: str,
+        actor_user_id: str | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> AuditLogEntry:
+        return self.record(
+            actor_user_id=actor_user_id or "anonymous",
+            action=event_type,
+            entity_type="auth_session",
+            entity_id="auth",
+            after=metadata,
+        )
+
+    def record_rls_denied(
+        self,
+        *,
+        actor_user_id: str,
+        resource_type: str,
+        resource_id: str,
+        metadata: dict[str, Any] | None = None,
+    ) -> AuditLogEntry:
+        return self.record(
+            actor_user_id=actor_user_id,
+            action="rls_denied",
+            entity_type=resource_type,
+            entity_id=resource_id,
+            after=metadata,
+        )

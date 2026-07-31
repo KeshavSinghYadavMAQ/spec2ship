@@ -14,12 +14,18 @@ import { useCostGuardrails } from "./hooks/useCostGuardrails";
 import { useKpis } from "./hooks/useKpis";
 
 const useStyles = makeStyles({
-  container: { display: "flex", flexDirection: "column", gap: "16px" },
-  filters: { display: "flex", gap: "8px", flexWrap: "wrap" },
-  cards: { display: "flex", gap: "16px", flexWrap: "wrap" },
-  card: { padding: "16px", minWidth: "200px", display: "flex", flexDirection: "column", gap: "4px" },
+  container: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalL },
+  filters: { display: "flex", gap: tokens.spacingHorizontalS, flexWrap: "wrap" },
+  cards: { display: "flex", gap: tokens.spacingHorizontalL, flexWrap: "wrap" },
+  card: {
+    padding: tokens.spacingVerticalL,
+    minWidth: "200px",
+    display: "flex",
+    flexDirection: "column",
+    gap: tokens.spacingVerticalXS,
+  },
   metric: { fontSize: tokens.fontSizeHero800, fontWeight: tokens.fontWeightSemibold },
-  breakdown: { display: "flex", flexDirection: "column", gap: "4px" },
+  breakdown: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalXS },
 });
 
 /**

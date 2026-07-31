@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/002-seed-data-responsive-ui/plan.md` (see also `research.md`, `data-model.md`,
+`specs/003-auth-rls-theme-redesign/plan.md` (see also `research.md`, `data-model.md`,
 `contracts/`, and `quickstart.md` in the same directory).
 <!-- SPECKIT END -->
 

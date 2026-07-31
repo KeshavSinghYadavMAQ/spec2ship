@@ -1,5 +1,4 @@
 import {
-  Badge,
   Body1,
   Spinner,
   Table,
@@ -10,13 +9,19 @@ import {
   TableRow,
   Title2,
   makeStyles,
+  tokens,
 } from "@fluentui/react-components";
 
+import { StatusBadge } from "../../components/StatusBadge";
+import { ScrollableTableContainer } from "../../components/ScrollableTableContainer";
+import { KpiCard } from "../../components/KpiCard";
 import { useInventoryPositions } from "./hooks/useInventoryPositions";
+import { useInventoryKpis } from "./hooks/useInventoryKpis";
 
 const useStyles = makeStyles({
-  container: { display: "flex", flexDirection: "column", gap: "12px" },
-  state: { display: "flex", alignItems: "center", gap: "8px" },
+  container: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM },
+  state: { display: "flex", alignItems: "center", gap: tokens.spacingHorizontalS },
+  kpiRow: { display: "flex", flexWrap: "wrap", gap: tokens.spacingHorizontalM },
 });
 
 /**
@@ -27,6 +32,7 @@ const useStyles = makeStyles({
 export function InventoryPositionView() {
   const styles = useStyles();
   const { data, isLoading, isError, error, isFetching } = useInventoryPositions();
+  const kpis = useInventoryKpis(data);
 
   return (
     <div className={styles.container}>
@@ -50,8 +56,14 @@ export function InventoryPositionView() {
 
       {!isLoading && !isError && data && data.length > 0 && (
         <>
+          <div className={styles.kpiRow}>
+            {kpis.map((kpi) => (
+              <KpiCard key={kpi.key} label={kpi.label} value={kpi.value} delta={kpi.delta} />
+            ))}
+          </div>
           {isFetching && <Body1>Refreshing...</Body1>}
-          <Table aria-label="Inventory positions">
+          <ScrollableTableContainer>
+            <Table aria-label="Inventory positions">
             <TableHeader>
               <TableRow>
                 <TableHeaderCell>SKU</TableHeaderCell>
@@ -72,15 +84,16 @@ export function InventoryPositionView() {
                   <TableCell>{position.reconciled_total}</TableCell>
                   <TableCell>
                     {position.data_freshness_warning ? (
-                      <Badge color="warning">Stale - reconciling</Badge>
+                      <StatusBadge tone="warning" label="Stale - reconciling" />
                     ) : (
-                      <Badge color="success">Fresh</Badge>
+                      <StatusBadge tone="success" label="Fresh" />
                     )}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          </ScrollableTableContainer>
         </>
       )}
     </div>

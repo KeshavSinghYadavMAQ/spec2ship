@@ -1,22 +1,28 @@
 import {
-  Body1,
   Button,
   Subtitle1,
   makeStyles,
   shorthands,
   tokens,
 } from "@fluentui/react-components";
+import { useQuery } from "@tanstack/react-query";
 import { WeatherMoonRegular, WeatherSunnyRegular } from "@fluentui/react-icons";
-import { NavLink, Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 
+import { AuthGuard } from "../components/AuthGuard";
+import { NavItem } from "../components/NavItem";
+import { primaryNavigation } from "./navigation";
 import { InventoryPositionView } from "../features/inventory/InventoryPositionView";
 import { AlertWorklist } from "../features/alerting/AlertWorklist";
 import { RecommendationPanel } from "../features/replenishment/RecommendationPanel";
 import { ForecastView } from "../features/forecasting/ForecastView";
 import { TransferSuggestions } from "../features/transfer-balance/TransferSuggestions";
 import { StorePriorityView } from "../features/transfer-balance/StorePriorityView";
+import { LoginPage } from "../features/auth/LoginPage";
 import { ProductLocationPolicyAdmin } from "../features/admin/ProductLocationPolicyAdmin";
+import { SampleDataPanel } from "../features/admin/SampleDataPanel";
 import { Dashboard } from "../features/analytics/Dashboard";
+import { authClient } from "../services/authClient";
 import { useThemeMode } from "../theme";
 
 const useStyles = makeStyles({
@@ -32,61 +38,47 @@ const useStyles = makeStyles({
     flexWrap: "wrap",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: "8px",
-    ...shorthands.padding("12px", "20px"),
-    borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+    gap: tokens.spacingHorizontalL,
+    ...shorthands.padding(tokens.spacingVerticalL, tokens.spacingHorizontalXXL),
+    borderBottom: `1px solid ${tokens.colorNeutralStroke1}`,
+    backgroundColor: tokens.colorNeutralBackground2,
   },
   nav: {
     display: "flex",
     flexWrap: "wrap",
-    gap: "8px 16px",
+    gap: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalM}`,
   },
   main: {
     flex: 1,
     minWidth: 0,
-    ...shorthands.padding("20px"),
+    ...shorthands.padding(tokens.spacingVerticalXXL),
   },
-});
-
-const navLinkStyle = ({ isActive }: { isActive: boolean }) => ({
-  fontWeight: isActive ? 700 : 400,
-  textDecoration: "none",
-  color: "inherit",
 });
 
 export function App() {
   const styles = useStyles();
   const { mode, toggleMode } = useThemeMode();
+  const navigate = useNavigate();
+  const sessionQuery = useQuery({
+    queryKey: ["auth", "session"],
+    queryFn: authClient.getSession,
+    retry: false,
+  });
+
+  async function handleLogout() {
+    await authClient.logout();
+    await sessionQuery.refetch();
+    navigate("/login", { replace: true });
+  }
 
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
         <Subtitle1 as="h1">Retail Replenishment</Subtitle1>
         <nav className={styles.nav} aria-label="Primary">
-          <NavLink to="/inventory" style={navLinkStyle}>
-            <Body1>Inventory</Body1>
-          </NavLink>
-          <NavLink to="/alerts" style={navLinkStyle}>
-            <Body1>Alerts</Body1>
-          </NavLink>
-          <NavLink to="/replenishment" style={navLinkStyle}>
-            <Body1>Replenishment</Body1>
-          </NavLink>
-          <NavLink to="/forecasts" style={navLinkStyle}>
-            <Body1>Forecasts</Body1>
-          </NavLink>
-          <NavLink to="/transfers" style={navLinkStyle}>
-            <Body1>Transfers</Body1>
-          </NavLink>
-          <NavLink to="/store-priority" style={navLinkStyle}>
-            <Body1>Store Priority</Body1>
-          </NavLink>
-          <NavLink to="/analytics" style={navLinkStyle}>
-            <Body1>Analytics</Body1>
-          </NavLink>
-          <NavLink to="/admin/policies" style={navLinkStyle}>
-            <Body1>Admin</Body1>
-          </NavLink>
+          {primaryNavigation.map((item) => (
+            <NavItem key={item.to} to={item.to} label={item.label} icon={item.icon} />
+          ))}
         </nav>
         <Button
           appearance="subtle"
@@ -96,18 +88,95 @@ export function App() {
         >
           {mode === "dark" ? "Light mode" : "Dark mode"}
         </Button>
+        {sessionQuery.data?.authenticated ? (
+          <Button appearance="subtle" onClick={handleLogout}>
+            Logout
+          </Button>
+        ) : null}
       </header>
       <main className={styles.main}>
         <Routes>
-          <Route path="/" element={<InventoryPositionView />} />
-          <Route path="/inventory" element={<InventoryPositionView />} />
-          <Route path="/alerts" element={<AlertWorklist />} />
-          <Route path="/replenishment" element={<RecommendationPanel />} />
-          <Route path="/forecasts" element={<ForecastView />} />
-          <Route path="/transfers" element={<TransferSuggestions />} />
-          <Route path="/store-priority" element={<StorePriorityView />} />
-          <Route path="/analytics" element={<Dashboard />} />
-          <Route path="/admin/policies" element={<ProductLocationPolicyAdmin />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/"
+            element={
+              <AuthGuard>
+                <InventoryPositionView />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/inventory"
+            element={
+              <AuthGuard>
+                <InventoryPositionView />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/alerts"
+            element={
+              <AuthGuard>
+                <AlertWorklist />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/replenishment"
+            element={
+              <AuthGuard>
+                <RecommendationPanel />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/forecasts"
+            element={
+              <AuthGuard>
+                <ForecastView />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/transfers"
+            element={
+              <AuthGuard>
+                <TransferSuggestions />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/store-priority"
+            element={
+              <AuthGuard>
+                <StorePriorityView />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/analytics"
+            element={
+              <AuthGuard>
+                <Dashboard />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/admin/policies"
+            element={
+              <AuthGuard>
+                <ProductLocationPolicyAdmin />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/admin/sample-data"
+            element={
+              <AuthGuard>
+                <SampleDataPanel />
+              </AuthGuard>
+            }
+          />
         </Routes>
       </main>
     </div>

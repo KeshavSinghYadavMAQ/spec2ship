@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Badge,
   Body1,
   Button,
   Dropdown,
@@ -16,15 +15,18 @@ import {
   Title2,
   Title3,
   makeStyles,
+  tokens,
 } from "@fluentui/react-components";
 
+import { StatusBadge } from "../../components/StatusBadge";
+import { ScrollableTableContainer } from "../../components/ScrollableTableContainer";
 import { ApiError, type PolicyInput, usePolicies, useUpsertPolicy } from "./hooks/usePolicies";
 
 const useStyles = makeStyles({
-  container: { display: "flex", flexDirection: "column", gap: "16px" },
-  identityBar: { display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" },
-  form: { display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "flex-end" },
-  field: { display: "flex", flexDirection: "column", gap: "4px", minWidth: "140px" },
+  container: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalL },
+  identityBar: { display: "flex", gap: tokens.spacingHorizontalS, alignItems: "center", flexWrap: "wrap" },
+  form: { display: "flex", gap: tokens.spacingHorizontalS, flexWrap: "wrap", alignItems: "flex-end" },
+  field: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalXS, minWidth: "140px" },
 });
 
 const numericFields: (keyof PolicyInput)[] = [
@@ -162,6 +164,7 @@ export function ProductLocationPolicyAdmin() {
       {!isLoading && !isError && data && data.length === 0 && <Body1>No policies configured.</Body1>}
 
       {!isLoading && !isError && data && data.length > 0 && (
+        <ScrollableTableContainer>
         <Table aria-label="Product-location policies">
           <TableHeader>
             <TableRow>
@@ -187,15 +190,17 @@ export function ProductLocationPolicyAdmin() {
                   {policy.min_qty} / {policy.max_qty}
                 </TableCell>
                 <TableCell>
-                  <Badge color={policy.edit_lock_held ? "warning" : "success"}>
-                    {policy.edit_lock_held ? "Locked" : "Editable"}
-                  </Badge>
+                  <StatusBadge
+                    tone={policy.edit_lock_held ? "warning" : "success"}
+                    label={policy.edit_lock_held ? "Locked" : "Editable"}
+                  />
                 </TableCell>
                 <TableCell>{policy.updated_by ?? "—"}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        </ScrollableTableContainer>
       )}
     </div>
   );

@@ -105,11 +105,21 @@ class DemandForecastRepository:
         return forecast
 
     def list(
-        self, sku_id: str | None = None, location_id: str | None = None
+        self,
+        sku_id: str | None = None,
+        location_id: str | None = None,
+        scoped_location_ids: set[str] | None = None,
+        all_locations: bool = True,
     ) -> list[DemandForecast]:
         query = self._session.query(DemandForecast)
         if sku_id:
             query = query.filter_by(sku_id=sku_id)
         if location_id:
             query = query.filter_by(location_id=location_id)
+        if not all_locations:
+            scoped_location_ids = scoped_location_ids or set()
+            if scoped_location_ids:
+                query = query.filter(DemandForecast.location_id.in_(scoped_location_ids))
+            else:
+                return []
         return query.order_by(DemandForecast.created_at.desc()).all()

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Badge,
   Body1,
   Button,
   Spinner,
@@ -12,14 +11,20 @@ import {
   TableRow,
   Title2,
   makeStyles,
+  tokens,
 } from "@fluentui/react-components";
 
+import { StatusBadge } from "../../components/StatusBadge";
+import { ScrollableTableContainer } from "../../components/ScrollableTableContainer";
+import { KpiCard } from "../../components/KpiCard";
 import { IdentityBar } from "../../components/IdentityBar";
+import { useAlertKpis } from "./hooks/useAlertKpis";
 import { type AlertStatus, useAlerts, useTransitionAlert } from "./hooks/useAlerts";
 
 const useStyles = makeStyles({
-  container: { display: "flex", flexDirection: "column", gap: "12px" },
-  actions: { display: "flex", gap: "8px" },
+  container: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM },
+  actions: { display: "flex", gap: tokens.spacingHorizontalS, flexWrap: "wrap" },
+  kpiRow: { display: "flex", gap: tokens.spacingHorizontalM, flexWrap: "wrap" },
 });
 
 const NEXT_STATUS_ACTIONS: Record<AlertStatus, AlertStatus[]> = {
@@ -39,6 +44,7 @@ export function AlertWorklist() {
   const [actingUserId, setActingUserId] = useState("store-manager-1");
   const [actingRole, setActingRole] = useState("store_manager");
   const { data, isLoading, isError, error } = useAlerts();
+  const kpis = useAlertKpis(data);
   const transitionAlert = useTransitionAlert(actingUserId, actingRole);
 
   return (
@@ -63,6 +69,13 @@ export function AlertWorklist() {
       {!isLoading && !isError && data && data.length === 0 && <Body1>No active alerts.</Body1>}
 
       {!isLoading && !isError && data && data.length > 0 && (
+        <>
+        <div className={styles.kpiRow}>
+          {kpis.map((kpi) => (
+            <KpiCard key={kpi.key} label={kpi.label} value={kpi.value} />
+          ))}
+        </div>
+        <ScrollableTableContainer>
         <Table aria-label="Stock alerts">
           <TableHeader>
             <TableRow>
@@ -79,9 +92,10 @@ export function AlertWorklist() {
                 <TableCell>{alert.sku_id}</TableCell>
                 <TableCell>{alert.location_id}</TableCell>
                 <TableCell>
-                  <Badge color={alert.severity === "out_of_stock" ? "danger" : "warning"}>
-                    {alert.severity}
-                  </Badge>
+                  <StatusBadge
+                    tone={alert.severity === "out_of_stock" ? "danger" : "warning"}
+                    label={alert.severity.replace(/_/g, " ")}
+                  />
                 </TableCell>
                 <TableCell>{alert.status}</TableCell>
                 <TableCell>
@@ -104,6 +118,8 @@ export function AlertWorklist() {
             ))}
           </TableBody>
         </Table>
+        </ScrollableTableContainer>
+        </>
       )}
     </div>
   );

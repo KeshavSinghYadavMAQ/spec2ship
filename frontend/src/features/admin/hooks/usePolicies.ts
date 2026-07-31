@@ -36,14 +36,11 @@ export function usePolicies() {
   });
 }
 
-export function useUpsertPolicy(actingUserId: string, actingRole: string) {
+export function useUpsertPolicy(_actingUserId: string, _actingRole: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: PolicyInput) =>
-      apiClient.post<ProductLocationPolicy>("/admin/product-location-policies", input, {
-        "X-User-Id": actingUserId,
-        "X-User-Role": actingRole,
-      }),
+      apiClient.post<ProductLocationPolicy>("/admin/product-location-policies", input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product-location-policies"] });
     },

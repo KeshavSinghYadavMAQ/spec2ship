@@ -94,9 +94,16 @@ class ReplenishmentRecommendationRepository:
     def get(self, recommendation_id: str) -> ReplenishmentRecommendation | None:
         return self._session.get(ReplenishmentRecommendation, recommendation_id)
 
-    def list(self) -> list[ReplenishmentRecommendation]:
-        return (
-            self._session.query(ReplenishmentRecommendation)
-            .order_by(ReplenishmentRecommendation.created_at.desc())
-            .all()
-        )
+    def list(
+        self,
+        scoped_location_ids: set[str] | None = None,
+        all_locations: bool = True,
+    ) -> list[ReplenishmentRecommendation]:
+        query = self._session.query(ReplenishmentRecommendation)
+        if not all_locations:
+            scoped_location_ids = scoped_location_ids or set()
+            if scoped_location_ids:
+                query = query.filter(ReplenishmentRecommendation.location_id.in_(scoped_location_ids))
+            else:
+                return []
+        return query.order_by(ReplenishmentRecommendation.created_at.desc()).all()

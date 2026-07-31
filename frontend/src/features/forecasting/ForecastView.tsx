@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Badge,
   Body1,
   Input,
   Spinner,
@@ -13,21 +12,25 @@ import {
   Title2,
   Title3,
   makeStyles,
+  tokens,
 } from "@fluentui/react-components";
 
+import { StatusBadge } from "../../components/StatusBadge";
+import { ScrollableTableContainer } from "../../components/ScrollableTableContainer";
+import type { StatusTone } from "../../theme";
 import { type ForecastErrorIndicator, useForecasts } from "./hooks/useForecasts";
 
 const useStyles = makeStyles({
-  container: { display: "flex", flexDirection: "column", gap: "12px" },
-  filters: { display: "flex", gap: "8px", flexWrap: "wrap" },
+  container: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM },
+  filters: { display: "flex", gap: tokens.spacingHorizontalS, flexWrap: "wrap" },
   narration: { maxWidth: "360px" },
 });
 
-const errorIndicatorColor: Record<ForecastErrorIndicator, "success" | "warning" | "danger" | "informative"> = {
+const errorIndicatorTone: Record<ForecastErrorIndicator, StatusTone> = {
   low: "success",
   medium: "warning",
   high: "danger",
-  insufficient_history: "informative",
+  insufficient_history: "info",
 };
 
 /**
@@ -68,6 +71,7 @@ export function ForecastView() {
       {!isLoading && !isError && data && data.length === 0 && <Body1>No forecasts available.</Body1>}
 
       {!isLoading && !isError && data && data.length > 0 && (
+        <ScrollableTableContainer>
         <Table aria-label="Demand forecasts">
           <TableHeader>
             <TableRow>
@@ -91,9 +95,10 @@ export function ForecastView() {
                 <TableCell>{forecast.forecast_quantity.toFixed(0)}</TableCell>
                 <TableCell>{forecast.trend_factor.toFixed(2)}x</TableCell>
                 <TableCell>
-                  <Badge color={errorIndicatorColor[forecast.error_indicator]}>
-                    {forecast.error_indicator.replace("_", " ")}
-                  </Badge>
+                  <StatusBadge
+                    tone={errorIndicatorTone[forecast.error_indicator]}
+                    label={forecast.error_indicator.replace(/_/g, " ")}
+                  />
                 </TableCell>
                 <TableCell>
                   <Title3 as="span" className={styles.narration}>
@@ -104,6 +109,7 @@ export function ForecastView() {
             ))}
           </TableBody>
         </Table>
+        </ScrollableTableContainer>
       )}
     </div>
   );

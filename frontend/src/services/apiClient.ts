@@ -18,6 +18,7 @@ export class ApiError extends Error {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
+    credentials: "include",
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -44,10 +45,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const apiClient = {
   get: <T,>(path: string) => request<T>(path, { method: "GET" }),
-  post: <T,>(path: string, body?: unknown, headers?: Record<string, string>) =>
+  post: <T,>(path: string, body?: unknown) =>
     request<T>(path, {
       method: "POST",
       body: body ? JSON.stringify(body) : undefined,
-      headers,
     }),
+  delete: <T,>(path: string) => request<T>(path, { method: "DELETE" }),
 };

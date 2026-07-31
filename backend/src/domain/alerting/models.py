@@ -111,13 +111,23 @@ class StockAlertRepository:
         return self._session.get(StockAlert, alert_id)
 
     def list(
-        self, status: str | None = None, severity: str | None = None
+        self,
+        status: str | None = None,
+        severity: str | None = None,
+        scoped_location_ids: set[str] | None = None,
+        all_locations: bool = True,
     ) -> list[StockAlert]:
         query = self._session.query(StockAlert)
         if status:
             query = query.filter_by(status=status)
         if severity:
             query = query.filter_by(severity=severity)
+        if not all_locations:
+            scoped_location_ids = scoped_location_ids or set()
+            if scoped_location_ids:
+                query = query.filter(StockAlert.location_id.in_(scoped_location_ids))
+            else:
+                return []
         return query.order_by(StockAlert.created_at.desc()).all()
 
     def find_active_for_sku_location(self, sku_id: str, location_id: str) -> StockAlert | None:

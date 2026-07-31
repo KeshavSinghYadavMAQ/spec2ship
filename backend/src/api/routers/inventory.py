@@ -8,15 +8,18 @@ requiring a separate background sweep.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
+from src.domain.admin.audit import AuditLogWriter
+from src.domain.admin.rbac import CurrentUser, Role, require_role
 from src.domain.alerting.evaluation_service import ThresholdEvaluationService
 from src.domain.alerting.policy_service import PolicyService
 from src.domain.inventory.integration_event import IntegrationEventInput
-from src.domain.inventory.models import InventoryPositionRead
+from src.domain.inventory.models import InventoryPosition, InventoryPositionRead
 from src.domain.inventory.service import InventoryService
+from src.domain.security.scope_service import ScopeResolutionService
 from src.infrastructure.cache import CacheClient, get_cache_client
 from src.infrastructure.cost_guardrails import cost_guardrails
 from src.infrastructure.db import get_db_session
@@ -29,10 +32,17 @@ async def list_positions(
     sku_id: str | None = None,
     location_id: str | None = None,
     session: Session = Depends(get_db_session),
+    current_user: CurrentUser = Depends(require_role(*Role)),
 ) -> list[InventoryPositionRead]:
     def _query() -> list[InventoryPositionRead]:
+        scope = ScopeResolutionService(session).resolve_for_user(current_user.user_id)
         service = InventoryService(session)
-        positions = service.list_positions(sku_id=sku_id, location_id=location_id)
+        positions = service.list_positions(
+            sku_id=sku_id,
+            location_id=location_id,
+            scoped_location_ids=set(scope.location_ids),
+            all_locations=scope.all_locations,
+        )
         return [
             InventoryPositionRead(
                 id=p.id,
@@ -46,6 +56,30 @@ async def list_positions(
             )
             for p in positions
         ]
+
+    return await run_in_threadpool(_query)
+
+
+@router.get("/positions/{position_id}", response_model=InventoryPositionRead)
+async def get_position(
+    position_id: str,
+    session: Session = Depends(get_db_session),
+    current_user: CurrentUser = Depends(require_role(*Role)),
+) -> InventoryPositionRead:
+    def _query() -> InventoryPositionRead:
+        scope = ScopeResolutionService(session).resolve_for_user(current_user.user_id)
+        position = session.get(InventoryPosition, position_id)
+        if position is None:
+            raise HTTPException(status_code=404, detail="Inventory position not found")
+        if not scope.all_locations and position.location_id not in scope.location_ids:
+            AuditLogWriter(session).record_rls_denied(
+                actor_user_id=current_user.user_id,
+                resource_type="inventory_position",
+                resource_id=position_id,
+                metadata={"location_id": position.location_id},
+            )
+            raise HTTPException(status_code=404, detail="Inventory position not found")
+        return InventoryPositionRead.model_validate(position)
 
     return await run_in_threadpool(_query)
 

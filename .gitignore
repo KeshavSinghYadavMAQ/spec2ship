@@ -32,7 +32,9 @@ frontend/test-results/
 .DS_Store
 Thumbs.db
 *.swp
+*.tmp
 .idea/
+.vscode/
 
 # Logs
 *.log

@@ -22,8 +22,9 @@ curl -Method POST http://localhost:8000/v1/admin/sample-data/seed `
 ```
 
 Expected: `202` with a `SeedRunSummary` (`seed_batch_id`, `status: "completed"` once finished,
-`counts_by_entity_type` showing non-zero counts for locations, products, policies, inventory
-positions, alerts, recommendations, forecasts, transfer suggestions, and store priority profiles).
+`counts_by_entity_type` showing non-zero counts for `inventory_position`,
+`product_location_policy`, `stock_alert`, `replenishment_recommendation`, `demand_forecast`,
+`transfer_suggestion`, and `store_priority_profile`).
 
 Re-run the same command: expect the same summary shape with counts unchanged (no duplicates —
 FR-003 idempotency).

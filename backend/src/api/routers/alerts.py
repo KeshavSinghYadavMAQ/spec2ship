@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
+from src.domain.admin.audit import AuditLogWriter
 from src.domain.admin.rbac import CurrentUser, Role, require_role
 from src.domain.alerting.models import (
     AlertStatus,
@@ -17,6 +18,7 @@ from src.domain.alerting.models import (
     StockAlertRead,
     StockAlertRepository,
 )
+from src.domain.security.scope_service import ScopeResolutionService
 from src.infrastructure.db import get_db_session
 from src.schemas.errors import ProblemDetail
 
@@ -32,10 +34,20 @@ async def list_alerts(
     status: str | None = None,
     severity: str | None = None,
     session: Session = Depends(get_db_session),
+    current_user: CurrentUser = Depends(require_role(*Role)),
 ) -> list[StockAlertRead]:
     def _query() -> list[StockAlertRead]:
+        scope = ScopeResolutionService(session).resolve_for_user(current_user.user_id)
         repo = StockAlertRepository(session)
-        return [StockAlertRead.model_validate(a) for a in repo.list(status=status, severity=severity)]
+        return [
+            StockAlertRead.model_validate(a)
+            for a in repo.list(
+                status=status,
+                severity=severity,
+                scoped_location_ids=set(scope.location_ids),
+                all_locations=scope.all_locations,
+            )
+        ]
 
     return await run_in_threadpool(_query)
 
@@ -48,9 +60,18 @@ async def transition_alert(
     _current_user: CurrentUser = Depends(require_role(*Role)),
 ) -> StockAlertRead:
     def _transition() -> StockAlertRead:
+        scope = ScopeResolutionService(session).resolve_for_user(_current_user.user_id)
         repo = StockAlertRepository(session)
         alert = repo.get(alert_id)
         if alert is None:
+            raise HTTPException(status_code=404, detail="Alert not found")
+        if not scope.all_locations and alert.location_id not in scope.location_ids:
+            AuditLogWriter(session).record_rls_denied(
+                actor_user_id=_current_user.user_id,
+                resource_type="stock_alert",
+                resource_id=alert_id,
+                metadata={"location_id": alert.location_id},
+            )
             raise HTTPException(status_code=404, detail="Alert not found")
         try:
             alert.transition_to(body.status)

@@ -15,6 +15,7 @@ import {
   Title2,
   Title3,
   makeStyles,
+  tokens,
 } from "@fluentui/react-components";
 
 import {
@@ -24,10 +25,16 @@ import {
   useRecommendations,
 } from "./hooks/useRecommendations";
 import { IdentityBar } from "../../components/IdentityBar";
+import { ScrollableTableContainer } from "../../components/ScrollableTableContainer";
 
 const useStyles = makeStyles({
-  container: { display: "flex", flexDirection: "column", gap: "12px" },
-  rowActions: { display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" },
+  container: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM },
+  rowActions: {
+    display: "flex",
+    gap: tokens.spacingHorizontalS,
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
   narration: { maxWidth: "360px" },
 });
 
@@ -66,6 +73,7 @@ export function RecommendationPanel() {
       )}
 
       {!isLoading && !isError && data && data.length > 0 && (
+        <ScrollableTableContainer>
         <Table aria-label="Replenishment recommendations">
           <TableHeader>
             <TableRow>
@@ -89,6 +97,7 @@ export function RecommendationPanel() {
             ))}
           </TableBody>
         </Table>
+        </ScrollableTableContainer>
       )}
     </div>
   );

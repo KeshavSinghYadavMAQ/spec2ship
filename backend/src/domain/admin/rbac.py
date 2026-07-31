@@ -16,8 +16,10 @@ from typing import Any
 from fastapi import Depends, HTTPException, Request, status
 from pydantic import BaseModel
 from sqlalchemy import JSON, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, Session, mapped_column
 
+from src.api.dependencies.auth_session import SessionPrincipal, optional_authenticated_session
+from src.infrastructure.db import get_db_session
 from src.infrastructure.db import Base
 
 
@@ -45,8 +47,33 @@ class CurrentUser(BaseModel):
     role: Role
 
 
-def get_current_user(request: Request) -> CurrentUser:
-    """Resolve the current user from request headers (v1 placeholder for Azure AD auth)."""
+def get_current_user(
+    request: Request,
+    session: Session = Depends(get_db_session),
+    session_principal: SessionPrincipal | None = Depends(optional_authenticated_session),
+) -> CurrentUser:
+    """Resolve identity from authenticated session first, with temporary header fallback."""
+    if session_principal is not None:
+        assignment = (
+            session.query(UserRoleAssignment)
+            .filter(UserRoleAssignment.user_id == session_principal.user_id)
+            .order_by(UserRoleAssignment.id.asc())
+            .first()
+        )
+        if assignment is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No role assignment configured for authenticated user",
+            )
+        try:
+            role = Role(assignment.role)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Invalid assigned role: {assignment.role}",
+            ) from exc
+        return CurrentUser(user_id=session_principal.user_id, role=role)
+
     user_id = request.headers.get("X-User-Id")
     role_header = request.headers.get("X-User-Role")
     if not user_id or not role_header:

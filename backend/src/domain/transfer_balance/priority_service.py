@@ -23,10 +23,21 @@ class StorePriorityService:
         self._session = session
         self._explainer = explainer or StorePriorityExplainerAgent()
 
-    def list_profiles(self, region: str | None = None) -> list[StorePriorityProfile]:
+    def list_profiles(
+        self,
+        region: str | None = None,
+        scoped_store_ids: set[str] | None = None,
+        all_locations: bool = True,
+    ) -> list[StorePriorityProfile]:
         query = self._session.query(StorePriorityProfile)
         if region:
             query = query.filter_by(region=region)
+        if not all_locations:
+            scoped_store_ids = scoped_store_ids or set()
+            if scoped_store_ids:
+                query = query.filter(StorePriorityProfile.store_id.in_(scoped_store_ids))
+            else:
+                return []
         return query.order_by(StorePriorityProfile.current_priority_rank).all()
 
     def recompute_rankings(

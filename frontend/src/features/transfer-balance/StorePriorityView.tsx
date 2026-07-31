@@ -13,14 +13,21 @@ import {
   Title2,
   Title3,
   makeStyles,
+  tokens,
 } from "@fluentui/react-components";
 
 import { ApiError } from "../../services/apiClient";
+import { ScrollableTableContainer } from "../../components/ScrollableTableContainer";
 import { useStorePriorityProfiles, useUpdatePriorityRules } from "./hooks/useStorePriority";
 
 const useStyles = makeStyles({
-  container: { display: "flex", flexDirection: "column", gap: "16px" },
-  filters: { display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "flex-end" },
+  container: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalL },
+  filters: {
+    display: "flex",
+    gap: tokens.spacingHorizontalS,
+    flexWrap: "wrap",
+    alignItems: "flex-end",
+  },
   narration: { maxWidth: "360px" },
 });
 
@@ -97,6 +104,7 @@ export function StorePriorityView() {
       {!isLoading && !isError && data && data.length === 0 && <Body1>No store profiles found.</Body1>}
 
       {!isLoading && !isError && data && data.length > 0 && (
+        <ScrollableTableContainer>
         <Table aria-label="Store priority profiles">
           <TableHeader>
             <TableRow>
@@ -123,6 +131,7 @@ export function StorePriorityView() {
             ))}
           </TableBody>
         </Table>
+        </ScrollableTableContainer>
       )}
     </div>
   );
