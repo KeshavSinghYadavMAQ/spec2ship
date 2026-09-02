@@ -16,6 +16,8 @@ handoffs:
 $ARGUMENTS
 ```
 
+Hook behavior is governed by [Agent Hook Policy](../agent-hook-policy.md).
+
 You **MUST** consider the user input before proceeding (if not empty).
 
 ## Pre-Execution Checks
@@ -101,6 +103,7 @@ Given that feature description, do this:
      ```
      Write the actual resolved directory path value (for example, `specs/003-user-auth`), not the literal string `SPECIFY_FEATURE_DIRECTORY`.
      This allows downstream commands (`/speckit.plan`, `/speckit.tasks`, etc.) to locate the feature directory without relying on git branch name conventions.
+    - Before downstream commands use `.specify/feature.json`, validate that its feature directory exists, contains the expected `spec.md`, and matches the current branch/worktree context. If the pointer is stale or ambiguous, require an explicit feature directory instead of proceeding.
 
    **IMPORTANT**:
    - You must only create one feature per `/speckit.specify` invocation
@@ -221,7 +224,7 @@ Given that feature description, do this:
            - Header separator must have at least 3 dashes: `|--------|`
            - Test that the table renders correctly in markdown preview
         5. Number questions sequentially (Q1, Q2, Q3 - max 3 total)
-        6. Present all questions together before waiting for responses
+      6. Present exactly one question at a time, matching `/speckit.clarify`
         7. Wait for user to respond with their choices for all questions (e.g., "Q1: A, Q2: Custom - [details], Q3: B")
         8. Update the spec by replacing each [NEEDS CLARIFICATION] marker with the user's selected or provided answer
         9. Re-run validation after all clarifications are resolved

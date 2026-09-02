@@ -1,0 +1,24 @@
+name: Validate Agent Metadata
+
+on:
+  push:
+    paths:
+      - '.github/agents/**'
+      - '.github/agent-hook-policy.md'
+      - '.github/scripts/validate-agent-metadata.ps1'
+      - '.github/workflows/validate-agent-metadata.yml'
+  pull_request:
+    paths:
+      - '.github/agents/**'
+      - '.github/agent-hook-policy.md'
+      - '.github/scripts/validate-agent-metadata.ps1'
+      - '.github/workflows/validate-agent-metadata.yml'
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate agent frontmatter and handoffs
+        shell: pwsh
+        run: .github/scripts/validate-agent-metadata.ps1

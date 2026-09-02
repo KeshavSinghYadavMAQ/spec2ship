@@ -32,8 +32,9 @@ flowchart TD
     E4 --> F[/speckit.implement]
     F --> F1[Hook: before_implement -> speckit.git.commit (optional)]
     F1 --> F2[speckit.implement]
-    F2 --> F3[Hook: after_implement -> speckit.git.commit (optional)]
-    F3 --> G[Done]
+    F2 --> F3[/speckit.analyze after implementation]
+    F3 --> F4[Hook: after_implement -> speckit.git.commit (optional)]
+    F4 --> G[Done]
 ```
 
 ## 2) Retail Domain Orchestrator Pipeline
@@ -64,7 +65,7 @@ flowchart LR
 5. Run /speckit.implement to execute tasks in phases.
 6. Run retail.orchestrator when the work spans multiple retail capabilities in parallel.
 
-## 4) Active Speckit Agents in This Pruned Setup
+## 4) Active Speckit Agents in This Setup
 
 - speckit.constitution
 - speckit.specify
@@ -73,3 +74,9 @@ flowchart LR
 - speckit.plan
 - speckit.tasks
 - speckit.implement
+- speckit.git.initialize
+- speckit.git.feature
+- speckit.git.commit
+
+The retail orchestrator owns eight stories: US1 through US6 map directly to the six domain agents;
+US7 is owned by `retail.alerting`, and US8 is owned by `retail.transfer-balance`.

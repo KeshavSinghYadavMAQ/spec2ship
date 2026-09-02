@@ -1,5 +1,8 @@
 # Retail Forecasting Skill
 
+See [Agent, Skill, and Harness Value Map](../../agent-skill-value-map.md). This legacy entry point is
+guidance only and must not calculate forecast values.
+
 ## Purpose
 Define demand forecasting behavior for SKU-store planning with seasonality and event sensitivity.
 
@@ -18,3 +21,9 @@ Define demand forecasting behavior for SKU-store planning with seasonality and e
 - Forecasting requirement refinements
 - Forecast KPI definitions
 - Harness scenarios for demand shocks and sparse data
+
+## Governance Gate
+
+This legacy entry point is aligned with `SKILL.md` and the `retail.forecasting` agent. Deliverables
+MUST include executable harness and contract-test paths, commands, and results, plus authorization,
+audit, cost, and Azure Well-Architected evidence before handoff to `retail.orchestrator`.

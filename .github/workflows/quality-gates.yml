@@ -1,0 +1,71 @@
+name: Quality Gates
+
+on:
+  pull_request:
+  push:
+    branches: [Main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Compile Python
+        run: python -m compileall -q src tests
+      - name: Lint
+        run: ruff check src tests
+      - name: Type check
+        run: mypy src
+      - name: Tests
+        run: pytest tests/unit tests/contract tests/integration tests/harness tests/evaluation -q
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
+      - name: Unit and evaluation tests
+        run: npm run test
+
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install contract validator
+        run: python -m pip install pyyaml
+      - name: Validate OpenAPI contract syntax
+        run: python -c "import yaml; yaml.safe_load(open('specs/001-retail-replenishment-v1/contracts/openapi.yaml'))"
+      - name: Validate Bicep template
+        uses: azure/cli@v2
+        with:
+          inlineScript: az bicep build --file infra/main.bicep
+
+  containers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build backend image
+        run: docker build --file backend/Dockerfile --tag retail-replenishment-api:ci backend
+      - name: Build frontend image
+        run: docker build --file frontend/Dockerfile --tag retail-replenishment-web:ci frontend

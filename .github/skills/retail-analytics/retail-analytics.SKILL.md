@@ -1,5 +1,8 @@
 # Retail Analytics Skill
 
+See [Agent, Skill, and Harness Value Map](../../agent-skill-value-map.md). This legacy entry point is
+guidance only and must not calculate KPI values.
+
 ## Purpose
 Define dashboard and KPI behavior for daily inventory and replenishment operations.
 
@@ -18,3 +21,9 @@ Define dashboard and KPI behavior for daily inventory and replenishment operatio
 - Dashboard requirement refinements
 - KPI dictionary
 - Harness scenarios for KPI correctness and trend validation
+
+## Governance Gate
+
+This legacy entry point is aligned with `SKILL.md` and the `retail.analytics` agent. Deliverables
+MUST include executable harness and contract-test paths, commands, and results, plus authorization,
+audit, cost, and Azure Well-Architected evidence before handoff to `retail.orchestrator`.

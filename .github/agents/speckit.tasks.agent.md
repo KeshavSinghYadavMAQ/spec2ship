@@ -13,6 +13,8 @@ handoffs:
 $ARGUMENTS
 ```
 
+Hook behavior is governed by [Agent Hook Policy](../agent-hook-policy.md).
+
 You **MUST** consider the user input before proceeding (if not empty).
 
 ## Pre-Execution Checks
@@ -127,7 +129,7 @@ The tasks.md should be immediately executable - each task must be specific enoug
 
 **CRITICAL**: Tasks MUST be organized by user story to enable independent implementation and testing.
 
-**Tests are OPTIONAL**: Only generate test tasks if explicitly requested in the feature specification or if user requests TDD approach.
+**Feature tests may be optional, but governance validation is mandatory**: Always generate executable harness tasks for every capability, plus contract-test tasks for every exposed contract. Feature-specific unit or integration tests may be omitted only when neither the specification nor the constitution requires them. A generated task list is invalid if it has no harness or required contract-test coverage.
 
 ### Checklist Format (REQUIRED)
 

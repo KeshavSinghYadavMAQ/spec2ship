@@ -8,6 +8,8 @@ description: Perform a non-destructive cross-artifact consistency and quality an
 $ARGUMENTS
 ```
 
+Hook behavior is governed by [Agent Hook Policy](../agent-hook-policy.md).
+
 You **MUST** consider the user input before proceeding (if not empty).
 
 ## Pre-Execution Checks

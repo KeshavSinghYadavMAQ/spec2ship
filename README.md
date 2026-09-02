@@ -2,6 +2,10 @@
 
 Production-grade, marketplace-oriented inventory replenishment solution for retail operations.
 
+**Release status**: ready for controlled staging deployment; Marketplace certification remains
+blocked on Azure staging evidence, notification/telemetry integrations, publisher/legal metadata,
+and Partner Center validation. See [docs/marketplace-readiness.md](docs/marketplace-readiness.md).
+
 ## Overview
 
 This project defines and delivers an agent-assisted replenishment platform that helps retail teams keep the right inventory at the right location and time.
@@ -78,7 +82,7 @@ This project is governed by the constitution in `.specify/memory/constitution.md
 ### SpecKit delivery pipeline
 
 - Constitution -> Specify -> Plan -> Tasks -> Implement
-- Git hooks are configured for feature branch creation and optional auto-commit checkpoints
+- Git hooks are configured for feature branch creation and explicitly confirmed commit checkpoints
 
 See full pipeline diagram in `.github/agentic-pipeline.md`.
 
@@ -92,6 +96,15 @@ See full pipeline diagram in `.github/agentic-pipeline.md`.
 - `retail.transfer-balance`
 - `retail.analytics`
 
+### Agent, skill, and harness responsibilities
+
+Delivery agents coordinate implementation and governance. Three runtime agents add bounded narration
+to deterministic replenishment, forecast, and store-priority results; they do not calculate or approve
+business decisions. Retail skills provide reusable domain checklists, while harnesses automate event
+replay, alert and policy workflows, approvals, failure handling, contract checks, and accessibility
+outside LLM reasoning. See [.github/agent-skill-value-map.md](.github/agent-skill-value-map.md) for the
+selection rationale and boundaries.
+
 ## Key Spec Artifacts
 
 - Active feature pointer: `.specify/feature.json`
@@ -104,6 +117,8 @@ See full pipeline diagram in `.github/agentic-pipeline.md`.
 - Quickstart (local setup + test commands): `specs/001-retail-replenishment-v1/quickstart.md`
 - Specification checklist: `specs/001-retail-replenishment-v1/checklists/requirements.md`
 - Agentic flow doc: `.github/agentic-pipeline.md`
+- Marketplace release package: `marketplace/README.md` and `marketplace/offer-metadata.template.yml`
+- Usage guide (local, evaluation, and Azure staging): [USAGE.md](USAGE.md)
 - Phase 11 polish review notes (security, performance, reliability/cost): see
   [docs/README.md](docs/README.md)
 

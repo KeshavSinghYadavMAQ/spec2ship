@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/003-auth-rls-theme-redesign/plan.md` (see also `research.md`, `data-model.md`,
+`specs/001-retail-replenishment-v1/plan.md` (see also `research.md`, `data-model.md`,
 `contracts/`, and `quickstart.md` in the same directory).
 <!-- SPECKIT END -->
 
@@ -18,12 +18,13 @@ Primary solution constraints:
 - Frontend MUST be implemented in React.
 - User-facing experiences MUST be responsive and support both dark and light mode.
 - Work MUST align with `.specify/memory/constitution.md` and the active feature spec.
+- Agent, skill, and harness responsibilities MUST follow `.github/agent-skill-value-map.md`.
 
 ## Backend Guidance
 
 - Prefer clear domain-driven service boundaries for inventory, alerting, replenishment, forecasting, transfer balancing, analytics, and admin configuration.
 - Keep business logic out of transport layers. API handlers, routes, and controllers should orchestrate, validate, and delegate to domain services.
-- Model agent interactions explicitly. Separate agent prompts, tools, orchestration logic, and business policy evaluation into distinct modules.
+- Model agent interactions explicitly. Delivery agents coordinate work; runtime agents only explain or assist using deterministic outputs. Separate agent prompts, tools, orchestration logic, and business policy evaluation into distinct modules.
 - Make Copilot SDK and MAF usage explainable and testable. Agent outputs should be structured, validated, and auditable.
 - Prefer typed Python code, explicit schemas, and validation at system boundaries.
 - Use deterministic policy logic where required and use agent reasoning to enrich explanations, summarization, prioritization, and operator assistance.
@@ -42,12 +43,13 @@ Primary solution constraints:
 
 ## MAF and Copilot SDK Guidance
 
-- Use MAF and Copilot SDK for orchestration, reasoning loops, tool invocation, and explainable decision support.
+- Use MAF and Copilot SDK for delivery orchestration and bounded explainable decision support, not for inventory arithmetic, threshold evaluation, forecast math, transfer feasibility, KPI aggregation, authorization, or audit writes.
 - Keep prompts versionable and domain-specific.
 - Prefer structured agent outputs over free-form text when outputs feed system decisions.
 - Always preserve explanation payloads for recommendation and prioritization results.
 - Define tool contracts clearly so agent steps can be tested independently.
 - Do not let the agent bypass core business safeguards such as thresholds, policy rules, or authorization checks.
+- Use harnesses to automate operational workflows and failure modes outside LLM reasoning; harnesses must remain deterministic with mocked agent responses.
 
 ## Frontend Guidance
 

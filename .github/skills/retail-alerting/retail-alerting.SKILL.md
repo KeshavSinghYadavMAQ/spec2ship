@@ -1,5 +1,8 @@
 # Retail Alerting Skill
 
+See [Agent, Skill, and Harness Value Map](../../agent-skill-value-map.md). This legacy entry point is
+guidance only and must not calculate alert decisions.
+
 ## Purpose
 Define low stock and out-of-stock alerting that is actionable, deduplicated, and role-routed.
 
@@ -18,3 +21,10 @@ Define low stock and out-of-stock alerting that is actionable, deduplicated, and
 - Alert policy definitions
 - Alert acceptance scenarios
 - Harness scenarios for burst and repeated breaches
+
+## Governance Gate
+
+This legacy entry point is aligned with `SKILL.md` and the `retail.alerting` agent. It also covers
+the product-location threshold admin panel and audit trail. Deliverables MUST include executable
+harness and contract-test paths, commands, and results, plus authorization, audit, cost, and
+Azure Well-Architected evidence before handoff to `retail.orchestrator`.

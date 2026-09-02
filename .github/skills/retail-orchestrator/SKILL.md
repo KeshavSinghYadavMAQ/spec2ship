@@ -1,5 +1,8 @@
 # Retail Orchestrator Skill
 
+See [Agent, Skill, and Harness Value Map](../../agent-skill-value-map.md). This skill coordinates
+delivery and readiness; it does not make runtime inventory or analytics decisions.
+
 ## Purpose
 Coordinate end-to-end delivery for the retail replenishment v1 scope (`specs/001-retail-replenishment-v1/spec.md`) across specialized domain agents, while enforcing constitution constraints (`.specify/memory/constitution.md`).
 
@@ -46,6 +49,13 @@ This table is the single place where spec-specific story/requirement IDs are pin
 - Cross-capability dependency map
 - Capability-by-capability readiness table (Ready / Blocked / In Progress)
 - Consolidated open risks and a single recommended next action
+
+## Readiness Gate
+
+The orchestrator MUST pass explicit story/FR scope, dependency, constitution, executable harness,
+contract-test, authorization, audit, and cost evidence through every handoff. A capability MUST NOT
+be marked Ready without file paths, commands, and passing results for its required harness and
+contract tests.
 
 ## Guardrails
 - Keep v1 scope limited to the eight active user stories in the spec

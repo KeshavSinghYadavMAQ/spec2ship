@@ -1,5 +1,8 @@
 # Retail Transfer Balance Skill
 
+See [Agent, Skill, and Harness Value Map](../../agent-skill-value-map.md). This skill defines a
+delivery checklist; feasibility and ranking remain deterministic service responsibilities.
+
 ## Purpose
 Define multi-store balancing and transfer suggestions to reduce shortages and excess stock, and define store restoration priority by region and consumption.
 
@@ -30,6 +33,14 @@ Define multi-store balancing and transfer suggestions to reduce shortages and ex
 - Feasibility assumptions
 - Harness scenarios for regional imbalance patterns
 - Store priority requirement refinements and priority factor explanation schema
+
+## Governance Gate
+
+Deliverables MUST include executable harness file paths, commands, and results for happy-path,
+failure-path, and data-quality scenarios, plus contract-test paths and results for every exposed
+contract. Responses MUST include authorization checks, audit events for priority and transfer
+decisions, cost/Azure Well-Architected evidence, open risks, and the standard handoff recommendation
+to `retail.orchestrator`.
 
 ## Handoff & Response Expectations
 When this skill is used to produce a deliverable, the response MUST follow the agent's Required Response Format: Scope Confirmation, Constitution Compliance, Deliverables Produced, Harness Coverage, Open Risks/Follow-ups, and a Handoff Recommendation back to `retail.orchestrator`.

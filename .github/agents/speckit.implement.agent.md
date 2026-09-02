@@ -8,6 +8,8 @@ description: Execute the implementation plan by processing and executing all tas
 $ARGUMENTS
 ```
 
+Hook behavior is governed by [Agent Hook Policy](../agent-hook-policy.md).
+
 You **MUST** consider the user input before proceeding (if not empty).
 
 ## Pre-Execution Checks
@@ -79,6 +81,8 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Display the table showing all checklists passed
      - Automatically proceed to step 3
 
+   - Before implementation, verify that tasks.md contains executable harness tasks for every capability and contract-test tasks for every exposed contract. Stop with an actionable error if either required category is absent.
+
 3. Load and analyze the implementation context:
    - **REQUIRED**: Read tasks.md for the complete task list and execution plan
    - **REQUIRED**: Read plan.md for tech stack, architecture, and file structure
@@ -95,7 +99,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Check if the following command succeeds to determine if the repository is a git repo (create/verify .gitignore if so):
 
      ```sh
-     git rev-parse --git-dir 2>/dev/null
+    git rev-parse --git-dir 2>$null
      ```
 
    - Check if Dockerfile* exists or Docker in plan.md → create/verify .dockerignore

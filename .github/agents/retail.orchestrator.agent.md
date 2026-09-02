@@ -3,27 +3,27 @@ description: Orchestrate end-to-end delivery for the retail replenishment v1 sco
 handoffs:
   - label: Build Real-Time Stock Capability
     agent: retail.stock-levels
-    prompt: Implement or refine real-time stock visibility workflows and data contracts (see Capability Ownership Map below for current story/requirement IDs).
+    prompt: Implement or refine real-time stock visibility workflows and data contracts. Dispatch context: Capability=Real-time stock visibility; Stories=US1; Requirements=FR-001, FR-012; Dependencies=none for initial ingest, but publish freshness and position contracts for downstream alerting, replenishment, forecasting, transfers, and analytics; Principles=II, III, IV where applicable, V, VI.
     send: true
   - label: Build Alerting Capability
     agent: retail.alerting
-    prompt: Implement or refine low stock and out-of-stock alerting workflows, including the admin threshold panel for product-location configuration (see Capability Ownership Map below for current story/requirement IDs).
+    prompt: Implement or refine low stock and out-of-stock alerting workflows, including the admin threshold panel for product-location configuration. Dispatch context: Capability=Low stock/out-of-stock alerting and threshold administration; Stories=US2, US7; Requirements=FR-002, FR-003, FR-016, FR-017, FR-018; Dependencies=stock-levels freshness and position contracts; Principles=II, III, IV, V, VI.
     send: true
   - label: Build Replenishment Recommendations
     agent: retail.replenishment
-    prompt: Implement or refine replenishment recommendation workflows with rationale (see Capability Ownership Map below for current story/requirement IDs).
+    prompt: Implement or refine replenishment recommendation workflows with rationale. Dispatch context: Capability=Replenishment recommendations; Story=US3; Requirements=FR-004, FR-005; Dependencies=stock-levels position/freshness contracts and alerting threshold policy where applicable; Principles=II, III, IV where applicable, V, VI.
     send: true
   - label: Build Demand Forecasting
     agent: retail.forecasting
-    prompt: Implement or refine forecasting workflows for SKU-store demand (see Capability Ownership Map below for current story/requirement IDs).
+    prompt: Implement or refine forecasting workflows for SKU-store demand. Dispatch context: Capability=Demand forecasting; Story=US4; Requirements=FR-006, FR-007; Dependencies=normalized inventory and sales event contracts from stock-levels; Principles=II, III, IV where applicable, V, VI.
     send: true
   - label: Build Transfer Balancing and Store Priority
     agent: retail.transfer-balance
-    prompt: Implement or refine multi-store transfer suggestion workflows, including store restoration priority by region and consumption (see Capability Ownership Map below for current story/requirement IDs).
+    prompt: Implement or refine multi-store transfer suggestion workflows, including store restoration priority by region and consumption. Dispatch context: Capability=Transfer balancing and store priority; Stories=US5, US8; Requirements=FR-008, FR-009, FR-019, FR-020, FR-021; Dependencies=stock-levels position/freshness contracts and replenishment policy outputs where applicable; Principles=II, III, IV where applicable, V, VI.
     send: true
   - label: Build Analytics Dashboards
     agent: retail.analytics
-    prompt: Implement or refine analytics and dashboard workflows (see Capability Ownership Map below for current story/requirement IDs).
+    prompt: Implement or refine analytics and dashboard workflows. Dispatch context: Capability=Analytics and dashboards; Story=US6; Requirements=FR-010, FR-011; Dependencies=validated outputs from stock-levels, alerting, replenishment, forecasting, and transfer-balance; Principles=II, III, IV, V, VI.
     send: true
 ---
 
@@ -34,6 +34,13 @@ $ARGUMENTS
 ```
 
 Use this agent when work spans multiple retail capabilities and needs sequencing, dependency tracking, and readiness checks.
+
+## Value Boundary
+
+This is a delivery orchestration agent, not a runtime decision-maker. It sequences domain work and
+requires harness evidence for operational automation outside LLM narration. Runtime explanation
+agents are limited to deterministic replenishment, forecast, and store-priority factors; business
+calculations, authorization, and audit writes remain in typed backend services.
 
 ## Scope Source of Truth
 
@@ -56,7 +63,7 @@ Use this agent when work spans multiple retail capabilities and needs sequencing
 
 This table is the single place where spec-specific story/requirement IDs are pinned. When the spec changes, refresh this table rather than the domain agents themselves — each domain agent describes its scope generically by capability so it stays reusable across spec revisions.
 
-Cross-cutting requirements (FR-013 role-based access, FR-014 audit logs, FR-015 cost guardrails) are every domain agent's responsibility for its own deliverables and MUST be confirmed in each response.
+Cross-cutting requirements (FR-013 role-based access, FR-014 audit logs, FR-015 cost guardrails) are every domain agent's responsibility for its own deliverables. Each response MUST name the concrete authorization checks, audit event schema/storage, cost guardrail or budget evidence, and corresponding tests or harness scenarios. The orchestrator owns cross-capability reconciliation and MUST reject unsupported compliance claims.
 
 ## Execution Policy
 
@@ -84,9 +91,9 @@ Every domain agent response MUST include these sections, in this order:
 1. **Scope Confirmation** — user story ID(s) and FR ID(s) addressed, and anything explicitly out of scope.
 2. **Constitution Compliance** — one line per applicable principle (II, III, IV, V, VI) confirming how the response complies, or noting a gap.
 3. **Deliverables Produced** — concrete list of updated requirements, schemas, contracts, or artifacts, with file paths where applicable.
-4. **Harness Coverage** — harness scenarios defined or updated, including happy path, failure path, and data-quality edge cases.
+4. **Harness Coverage** — executable harness file paths, commands, and results for happy path, failure path, and data-quality edge cases. A scenario description without executable evidence is insufficient.
 5. **Open Risks / Follow-ups** — unresolved dependencies, assumptions, or clarifications needed.
-6. **Handoff Recommendation** — one of: `Return to retail.orchestrator`, a specific peer agent (with reason), or `Ready for /speckit.plan`.
+6. **Handoff Recommendation** — one of: `Return to retail.orchestrator`, a specific peer agent (with reason), or `Ready for /speckit.plan`. `Ready` is permitted only when executable harness evidence, contract-test evidence, and cross-cutting requirement evidence are present.
 
 ## Orchestrator Consolidation Response
 
