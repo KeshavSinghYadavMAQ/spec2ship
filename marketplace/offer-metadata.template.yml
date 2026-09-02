@@ -1,0 +1,28 @@
+# Complete with publisher-owned values before Partner Center submission.
+offer:
+  name: retail-replenishment
+  version: 1.0.0
+  category: analytics
+  applicable_regions: []
+  pricing_model: REPLACE_WITH_COMMERCIAL_MODEL
+  support_url: https://REPLACE_WITH_PUBLIC_SUPPORT_URL
+  privacy_url: https://REPLACE_WITH_PUBLIC_PRIVACY_URL
+  terms_url: https://REPLACE_WITH_PUBLIC_TERMS_URL
+  eula_url: https://REPLACE_WITH_PUBLIC_EULA_URL
+  documentation_url: https://REPLACE_WITH_PUBLIC_DOCUMENTATION_URL
+  publisher_contact: REPLACE_WITH_PUBLISHER_CONTACT
+  security_contact: REPLACE_WITH_SECURITY_CONTACT
+  data_residency_statement: REPLACE_WITH_DATA_RESIDENCY_STATEMENT
+
+deployment:
+  bicep_entrypoint: infra/main.bicep
+  parameter_example: infra/dev.bicepparam
+  backend_image: REPLACE_WITH_SIGNED_IMAGE_DIGEST
+  frontend_artifact: REPLACE_WITH_FRONTEND_ARTIFACT
+  required_external_inputs:
+    - Azure subscription and resource group
+    - Entra tenant, application registration, issuer, audience, and JWKS URL
+    - SQL administrator secret from a secret store
+    - Application database, Redis, and Service Bus connection values from a secret store
+    - Container registry access
+    - Notification provider credentials and verified sender identity
